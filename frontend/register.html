@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro — Vortex ERP</title>
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/login.css" />
+  <link rel="stylesheet" href="assets/css/forms.css" />
+</head>
+<body class="auth-page">
+  <!-- Página de registro: formulário para criação de nova conta -->
+  <main class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <img src="assets/img/logo.svg" alt="Vortex ERP" />
+      </div>
+      <h1>Criar conta</h1>
+      <form id="form-register" novalidate>
+        <div class="form-group">
+          <label for="name">Nome completo</label>
+          <input type="text" id="name" name="name" required placeholder="Seu Nome" />
+        </div>
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" required placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <input type="password" id="password" name="password" required placeholder="••••••••" />
+        </div>
+        <div class="form-group">
+          <label for="confirm-password">Confirmar senha</label>
+          <input type="password" id="confirm-password" name="confirmPassword" required placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Criar conta</button>
+      </form>
+      <p class="auth-footer">Já tem conta? <a href="login.html">Entrar</a></p>
+    </div>
+  </main>
+
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/session.js"></script>
+  <script src="assets/js/api-client.js"></script>
+  <script src="assets/js/validators.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    document.getElementById('form-register').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      document.querySelectorAll('.field-error').forEach(el => el.remove());
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm-password').value;
+
+      // Validações client-side
+      if (!name || !email || !password) {
+        showError('Preencha todos os campos.', btn);
+        return;
+      }
+      if (password !== confirm) {
+        showError('As senhas não coincidem.', btn);
+        return;
+      }
+      const strength = Validators.passwordStrength(password);
+      if (!strength.valid) {
+        showError(strength.errors.join(' '), btn);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Aguarde...';
+
+      const result = await Auth.register({ name, email, password });
+
+      if (result.success) {
+        window.location.href = 'login.html';
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Criar conta';
+        const msg = {
+          email_em_uso: 'Este e-mail já está cadastrado.',
+          campos_obrigatorios: 'Preencha todos os campos.',
+          erro_servidor: 'Erro ao conectar com o servidor.',
+        }[result.error] || 'Erro ao criar conta.';
+        showError(msg, btn);
+      }
+    });
+
+    function showError(msg, btn) {
+      const err = document.createElement('p');
+      err.className = 'field-error';
+      err.style.color = 'var(--error, #e53e3e)';
+      err.style.marginTop = '8px';
+      err.textContent = msg;
+      btn.before(err);
+    }
+  </script>
+</body>
+</html>

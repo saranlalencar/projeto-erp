@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "name": "Administrador",
+    "email": "admin@vortex.com",
+    "password": "Admin@123",
+    "role": "admin",
+    "status": "ativo",
+    "avatar": null,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "2",
+    "name": "Maria Gerente",
+    "email": "gerente@vortex.com",
+    "password": "Gerente@123",
+    "role": "manager",
+    "status": "ativo",
+    "avatar": null,
+    "createdAt": "2025-02-15T10:00:00.000Z"
+  },
+  {
+    "id": "3",
+    "name": "João Silva",
+    "email": "joao@vortex.com",
+    "password": "User@123",
+    "role": "user",
+    "status": "ativo",
+    "avatar": null,
+    "createdAt": "2025-03-10T09:00:00.000Z"
+  },
+  {
+    "id": "4",
+    "name": "Ana Costa",
+    "email": "ana@vortex.com",
+    "password": "User@123",
+    "role": "user",
+    "status": "bloqueado",
+    "avatar": null,
+    "createdAt": "2025-04-01T08:00:00.000Z"
+  }
+]

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VORTEX ERP — Documentação Técnica Completa v2</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1a1a2e; background: #fff; line-height: 1.7; }
+  @media print {
+    .no-print { display: none !important; }
+    .page-break { page-break-before: always; }
+    body { font-size: 11px; }
+  }
+  .cover { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%); color: #fff; padding: 60px 40px; }
+  .cover .logo { font-size: 72px; margin-bottom: 16px; }
+  .cover h1 { font-size: 42px; font-weight: 800; margin-bottom: 8px; }
+  .cover .subtitle { font-size: 18px; color: #c7d2fe; margin-bottom: 40px; }
+  .cover .badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+  .badge { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 99px; padding: 6px 16px; font-size: 13px; font-weight: 600; }
+  .badge.new { background: rgba(16,185,129,.3); border-color: rgba(16,185,129,.6); }
+  .cover .meta { font-size: 13px; color: #a5b4fc; margin-top: 12px; }
+  .content { max-width: 960px; margin: 0 auto; padding: 60px 40px; }
+  h1 { font-size: 26px; font-weight: 800; color: #1e1b4b; margin-bottom: 8px; border-bottom: 3px solid #4f46e5; padding-bottom: 8px; }
+  h2 { font-size: 18px; font-weight: 700; color: #312e81; margin: 36px 0 10px; padding-left: 12px; border-left: 4px solid #4f46e5; }
+  h3 { font-size: 14px; font-weight: 700; color: #1e40af; margin: 20px 0 6px; }
+  h4 { font-size: 13px; font-weight: 700; color: #374151; margin: 14px 0 4px; }
+  p { margin-bottom: 10px; color: #374151; }
+  ul, ol { padding-left: 22px; margin-bottom: 10px; color: #374151; }
+  li { margin-bottom: 4px; }
+  strong { color: #1e1b4b; }
+  .info  { background: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 6px; padding: 12px 16px; margin: 12px 0; }
+  .warn  { background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 6px; padding: 12px 16px; margin: 12px 0; }
+  .danger{ background: #fee2e2; border-left: 4px solid #ef4444; border-radius: 6px; padding: 12px 16px; margin: 12px 0; }
+  .ok    { background: #d1fae5; border-left: 4px solid #10b981; border-radius: 6px; padding: 12px 16px; margin: 12px 0; }
+  .new-feature { background: #ede9fe; border-left: 4px solid #7c3aed; border-radius: 6px; padding: 12px 16px; margin: 12px 0; }
+  code { font-family: 'Consolas', monospace; font-size: 12px; background: #f3f4f6; border-radius: 4px; padding: 1px 5px; color: #7c3aed; }
+  pre  { background: #1e1b4b; color: #e2e8f0; font-family: 'Consolas', monospace; font-size: 11px; border-radius: 8px; padding: 16px 20px; margin: 12px 0; overflow-x: auto; line-height: 1.6; }
+  pre .comment { color: #6b7280; }
+  pre .key { color: #93c5fd; }
+  pre .str { color: #fde68a; }
+  pre .kw  { color: #f9a8d4; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 12px; }
+  th { background: #1e1b4b; color: #fff; padding: 9px 13px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  td { padding: 8px 13px; border-bottom: 1px solid #e5e7eb; color: #374151; vertical-align: top; }
+  tr:nth-child(even) td { background: #f9fafb; }
+  .tech-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin: 18px 0; }
+  .tech-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; text-align: center; }
+  .tech-card .icon { font-size: 26px; margin-bottom: 4px; }
+  .tech-card .name { font-weight: 700; font-size: 13px; color: #1e1b4b; }
+  .tech-card .role { font-size: 11px; color: #6b7280; }
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 24px 0; }
+  .flow-row { display: flex; align-items: center; justify-content: center; gap: 0; }
+  .flow-box { background: #fff; border: 2px solid #4f46e5; border-radius: 10px; padding: 10px 18px; text-align: center; font-weight: 700; font-size: 12px; color: #1e1b4b; min-width: 140px; box-shadow: 0 2px 8px rgba(79,70,229,.15); }
+  .flow-box.db    { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
+  .flow-box.mid   { background: #dbeafe; border-color: #3b82f6; color: #1e40af; }
+  .flow-box.green { background: #d1fae5; border-color: #10b981; color: #065f46; }
+  .flow-box.red   { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+  .flow-box.purple{ background: #ede9fe; border-color: #7c3aed; color: #5b21b6; }
+  .flow-arrow { font-size: 20px; color: #6b7280; margin: 0 6px; }
+  .flow-down  { font-size: 20px; color: #6b7280; text-align: center; margin: 4px 0; }
+  .tree { background: #1e1b4b; color: #e2e8f0; border-radius: 10px; padding: 18px 22px; margin: 14px 0; font-family: 'Consolas', monospace; font-size: 12px; line-height: 1.9; }
+  .tree .dir  { color: #93c5fd; font-weight: 700; }
+  .tree .file { color: #6ee7b7; }
+  .tree .cfg  { color: #fde68a; }
+  .tree .note { color: #9ca3af; font-style: italic; }
+  .tree .new  { color: #f9a8d4; font-weight: 700; }
+  .steps { margin: 14px 0; }
+  .step  { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+  .step-num { min-width: 30px; height: 30px; background: #4f46e5; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0; }
+  .step-body h4 { margin: 0 0 2px; font-size: 13px; }
+  .step-body p  { margin: 0; font-size: 12px; }
+  .section { margin-bottom: 56px; }
+  .toc { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 22px 26px; margin: 28px 0; }
+  .toc h3 { margin-top: 0; color: #1e1b4b; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 5px; font-size: 13px; }
+  .toc a  { color: #4f46e5; text-decoration: none; font-weight: 500; }
+  footer { text-align: center; padding: 28px; background: #f9fafb; border-top: 1px solid #e5e7eb; color: #9ca3af; font-size: 12px; margin-top: 60px; }
+  .chip { display: inline-block; background: #ede9fe; color: #5b21b6; border-radius: 99px; padding: 2px 10px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .chip.green { background: #d1fae5; color: #065f46; }
+  .chip.red   { background: #fee2e2; color: #991b1b; }
+  .chip.amber { background: #fef3c7; color: #92400e; }
+  .chip.blue  { background: #dbeafe; color: #1e40af; }
+  .chip.new   { background: #f9a8d4; color: #9d174d; }
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<div class="cover no-print">
+  <div class="logo">⚡</div>
+  <h1>VORTEX ERP</h1>
+  <div class="subtitle">Documentação Técnica Completa — Versão 2.0</div>
+  <div class="badges">
+    <span class="badge">🟦 TypeScript</span>
+    <span class="badge">⚛️ React 19</span>
+    <span class="badge">🟩 Node.js + Express</span>
+    <span class="badge new">🐘 Supabase PostgreSQL</span>
+    <span class="badge">🔷 Prisma ORM</span>
+    <span class="badge">🔐 JWT Auth</span>
+    <span class="badge new">📧 Verificação por E-mail</span>
+    <span class="badge">⚡ Vite</span>
+  </div>
+  <p class="meta">✅ Banco de dados migrado para Supabase (PostgreSQL na nuvem)</p>
+  <p class="meta">✅ Verificação de e-mail no cadastro + notificação na troca de senha</p>
+  <p class="meta" style="margin-top:12px">Versão 2.0 · 2026</p>
+</div>
+
+<div class="content">
+
+<!-- ÍNDICE -->
+<div class="toc">
+  <h3>📋 Índice</h3>
+  <ol>
+    <li><a href="#visao">Visão Geral do Sistema</a></li>
+    <li><a href="#tecnologias">Tecnologias Utilizadas</a></li>
+    <li><a href="#supabase">Supabase — Integração com Banco na Nuvem</a> <span class="chip new">NOVO</span></li>
+    <li><a href="#estrutura">Estrutura de Pastas e Arquivos</a></li>
+    <li><a href="#fluxograma">Fluxograma de Arquitetura</a></li>
+    <li><a href="#banco">Banco de Dados — Schema Prisma</a></li>
+    <li><a href="#backend">Backend — Node.js + Express + TypeScript</a></li>
+    <li><a href="#email">Sistema de E-mail Completo</a> <span class="chip new">NOVO</span></li>
+    <li><a href="#frontend-react">Frontend React + Vite</a></li>
+    <li><a href="#conexao">Como Frontend e Backend se Conectam</a></li>
+    <li><a href="#autenticacao">Autenticação — JWT + Verificação de E-mail</a> <span class="chip new">ATUALIZADO</span></li>
+    <li><a href="#login-fluxo">Fluxos Completos — Cadastro, Login, Recuperação e Troca de Senha</a> <span class="chip new">ATUALIZADO</span></li>
+    <li><a href="#rbac">Controle de Acesso por Perfil (RBAC)</a></li>
+    <li><a href="#ambiente">Configurações de Ambiente (.env)</a></li>
+    <li><a href="#seguranca">Segurança</a></li>
+    <li><a href="#modulos">Módulos do ERP</a></li>
+    <li><a href="#seed">Dados de Teste (Seed)</a></li>
+    <li><a href="#refazer">Como Recriar o Sistema do Zero</a></li>
+  </ol>
+</div>
+
+<!-- 1. VISÃO GERAL -->
+<div class="section" id="visao">
+<h1>1. Visão Geral do Sistema</h1>
+<p>O <strong>VORTEX ERP</strong> é um sistema de gestão empresarial completo com autenticação segura por e-mail e banco de dados na nuvem via Supabase.</p>
+
+<div class="ok">
+  <strong>Versão 2.0 — O que mudou:</strong>
+  <ul style="margin-top:6px">
+    <li>✅ Banco de dados migrado do PostgreSQL local para o <strong>Supabase</strong> (PostgreSQL na nuvem)</li>
+    <li>✅ <strong>Verificação de e-mail</strong> obrigatória no cadastro de novos usuários</li>
+    <li>✅ <strong>Notificação por e-mail</strong> quando a senha é alterada</li>
+    <li>✅ Novos endpoints: <code>POST /auth/verify-email</code> e <code>POST /auth/resend-verification</code></li>
+    <li>✅ Nova página React: <code>/verificar-email</code></li>
+  </ul>
+</div>
+
+<h2>Resumo da Stack</h2>
+<table>
+  <tr><th>Camada</th><th>Tecnologia</th><th>Finalidade</th></tr>
+  <tr><td>Frontend React</td><td>React 19 + Vite + TypeScript</td><td>Interface moderna (porta 5173)</td></tr>
+  <tr><td>Frontend HTML</td><td>HTML + CSS + JavaScript</td><td>Interface original (porta 5500)</td></tr>
+  <tr><td>Backend</td><td>Node.js + Express + TypeScript</td><td>API REST (porta 3000)</td></tr>
+  <tr><td>ORM</td><td>Prisma v5</td><td>Comunicação type-safe com o banco</td></tr>
+  <tr><td><strong>Banco de Dados</strong></td><td><strong>Supabase (PostgreSQL)</strong></td><td><strong>Armazenamento na nuvem — inktgatsnofilqdkqhbz</strong></td></tr>
+  <tr><td>Autenticação</td><td>JWT + bcrypt</td><td>Login seguro, tokens de 8h</td></tr>
+  <tr><td>E-mail</td><td>Nodemailer + Gmail SMTP</td><td>Verificação de conta, recuperação e notificações</td></tr>
+</table>
+</div>
+
+<!-- 2. TECNOLOGIAS -->
+<div class="section page-break" id="tecnologias">
+<h1>2. Tecnologias Utilizadas</h1>
+<div class="tech-grid">
+  <div class="tech-card"><div class="icon">🟩</div><div class="name">Node.js 18+</div><div class="role">Runtime JS no servidor</div></div>
+  <div class="tech-card"><div class="icon">🟦</div><div class="name">TypeScript</div><div class="role">Tipagem estática</div></div>
+  <div class="tech-card"><div class="icon">⚡</div><div class="name">Express</div><div class="role">Framework HTTP/API</div></div>
+  <div class="tech-card"><div class="icon">⚛️</div><div class="name">React 19</div><div class="role">UI reativa</div></div>
+  <div class="tech-card"><div class="icon">⚡</div><div class="name">Vite</div><div class="role">Bundler ultrarrápido</div></div>
+  <div class="tech-card"><div class="icon">🔷</div><div class="name">Prisma ORM</div><div class="role">Acesso ao banco</div></div>
+  <div class="tech-card"><div class="icon">🐘</div><div class="name">Supabase</div><div class="role">PostgreSQL na nuvem</div></div>
+  <div class="tech-card"><div class="icon">🔐</div><div class="name">JWT</div><div class="role">Autenticação stateless</div></div>
+  <div class="tech-card"><div class="icon">🔒</div><div class="name">bcrypt</div><div class="role">Hash seguro de senhas</div></div>
+  <div class="tech-card"><div class="icon">📧</div><div class="name">Nodemailer</div><div class="role">E-mails via Gmail SMTP</div></div>
+  <div class="tech-card"><div class="icon">🌐</div><div class="name">CORS</div><div class="role">Cross-Origin permitido</div></div>
+  <div class="tech-card"><div class="icon">🔑</div><div class="name">dotenv</div><div class="role">Variáveis de ambiente</div></div>
+</div>
+</div>
+
+<!-- 3. SUPABASE -->
+<div class="section page-break" id="supabase">
+<h1>3. Supabase — Integração com Banco na Nuvem <span class="chip new">NOVO</span></h1>
+
+<h2>3.1 O que é o Supabase?</h2>
+<p>Supabase é uma plataforma <strong>Backend-as-a-Service</strong> que fornece um banco de dados <strong>PostgreSQL gerenciado na nuvem</strong>, gratuitamente no plano free. Em vez de depender de um PostgreSQL instalado localmente, o banco fica em servidores da AWS e está sempre acessível.</p>
+
+<div class="info">
+  <strong>Projeto VORTEX ERP no Supabase:</strong><br>
+  Project ID: <code>inktgatsnofilqdkqhbz</code><br>
+  Host: <code>db.inktgatsnofilqdkqhbz.supabase.co</code><br>
+  Região: US East (Virginia)
+</div>
+
+<h2>3.2 O que mudou no código</h2>
+<table>
+  <tr><th>Antes (local)</th><th>Depois (Supabase)</th></tr>
+  <tr><td><code>postgresql://postgres:1234@localhost:5432/vortex_erp</code></td><td><code>postgresql://postgres:%40...@db.inktgatsnofilqdkqhbz.supabase.co:5432/postgres</code></td></tr>
+  <tr><td>PostgreSQL instalado no PC</td><td>PostgreSQL na nuvem (AWS)</td></tr>
+  <tr><td>Dados só existem no seu computador</td><td>Dados acessíveis de qualquer lugar</td></tr>
+  <tr><td>Precisa do PostgreSQL rodando localmente</td><td>Sem necessidade de instalação local</td></tr>
+</table>
+
+<p><strong>Apenas o arquivo <code>.env</code> mudou.</strong> Todo o código do backend, as rotas, o Prisma e o frontend continuam exatamente iguais — porque o Prisma abstrai o banco.</p>
+
+<h2>3.3 Como o Prisma se conecta ao Supabase</h2>
+<pre>
+<span class="comment"># .env — única mudança necessária</span>
+DATABASE_URL=<span class="str">"postgresql://postgres:%40SuaSenha@db.inktgatsnofilqdkqhbz.supabase.co:5432/postgres"</span>
+
+<span class="comment"># Nota: o @ na senha é URL-encoded como %40</span>
+<span class="comment"># Se sua senha for "@MinhaSenh4", no .env fica: "%40MinhaSenh4"</span>
+</pre>
+
+<h2>3.4 Migrations aplicadas no Supabase</h2>
+<p>As migrations criam as tabelas automaticamente. Foram aplicadas 4 migrations em sequência:</p>
+<table>
+  <tr><th>Migration</th><th>O que criou</th></tr>
+  <tr><td><code>20260522_inicio</code></td><td>Tabelas básicas: User, PasswordResetCode</td></tr>
+  <tr><td><code>20260526_add_user_password_reset</code></td><td>Ajustes no modelo User</td></tr>
+  <tr><td><code>20260526_add_funcionario_itemvenda</code></td><td>Funcionario, Cliente, Produto, Venda, ItemVenda, ContaFinanceira</td></tr>
+  <tr><td><code>20260527_supabase_email_verification</code></td><td>Novos campos: emailVerified, emailVerificationCode, emailVerificationExpiry</td></tr>
+</table>
+
+<h2>3.5 Como acessar o banco pelo painel Supabase</h2>
+<ol>
+  <li>Acesse <strong>supabase.com</strong> → entre no projeto</li>
+  <li>Clique em <strong>Table Editor</strong> para ver e editar os dados visualmente</li>
+  <li>Clique em <strong>SQL Editor</strong> para rodar queries SQL diretas</li>
+  <li>Clique em <strong>Authentication</strong> → mas atenção: NÃO usamos o Supabase Auth, apenas o banco PostgreSQL</li>
+</ol>
+
+<div class="warn">
+  <strong>Alternativa local:</strong> Para visualizar os dados sem acessar o painel web, use:<br>
+  <code>npx prisma studio</code> — abre uma interface visual em <code>http://localhost:5555</code>
+</div>
+
+<h2>3.6 Plano Free do Supabase — Limites importantes</h2>
+<table>
+  <tr><th>Recurso</th><th>Limite free</th><th>Impacto no projeto</th></tr>
+  <tr><td>Armazenamento do banco</td><td>500 MB</td><td>Suficiente para centenas de milhares de registros</td></tr>
+  <tr><td>Conexões simultâneas</td><td>60</td><td>OK para uso em desenvolvimento/pequena empresa</td></tr>
+  <tr><td>Pausa por inatividade</td><td>Pausa após 7 dias sem uso</td><td>Primeira requisição após pausa pode demorar ~5s para "acordar"</td></tr>
+  <tr><td>Projetos gratuitos</td><td>2 projetos</td><td>—</td></tr>
+</table>
+</div>
+
+<!-- 4. ESTRUTURA -->
+<div class="section page-break" id="estrutura">
+<h1>4. Estrutura de Pastas e Arquivos</h1>
+
+<div class="tree">
+<span class="dir">VORTEX_ERP/</span>
+│
+├── <span class="cfg">.env</span>                              <span class="note">← DATABASE_URL agora aponta para Supabase</span>
+├── <span class="cfg">.gitignore</span>
+├── <span class="cfg">package.json</span>
+├── <span class="cfg">tsconfig.json</span>
+│
+├── <span class="dir">prisma/</span>
+│   ├── <span class="file">schema.prisma</span>               <span class="note">← User agora tem emailVerified, emailVerificationCode, emailVerificationExpiry</span>
+│   ├── <span class="file">seed.ts</span>                     <span class="note">← usuários do seed criados com emailVerified: true</span>
+│   └── <span class="dir">migrations/</span>                 <span class="note">← 4 migrations aplicadas no Supabase</span>
+│
+├── <span class="dir">src/</span>
+│   ├── <span class="file">index.ts</span>
+│   ├── <span class="file">prisma.ts</span>
+│   ├── <span class="file">mailer.ts</span>                   <span class="note">← 3 funções: sendVerificationEmail, sendRecoveryEmail, sendPasswordChangedEmail</span>
+│   ├── <span class="dir">middleware/</span>
+│   │   └── <span class="file">auth.ts</span>
+│   └── <span class="dir">routes/</span>
+│       ├── <span class="file">auth.ts</span>                   <span class="note">← +2 novos endpoints: /verify-email e /resend-verification</span>
+│       ├── <span class="file">users.ts</span>
+│       ├── <span class="file">clientes.ts</span>
+│       ├── <span class="file">estoque.ts</span>
+│       ├── <span class="file">financeiro.ts</span>
+│       └── <span class="file">vendas.ts</span>
+│
+├── <span class="dir">frontend/</span>                         <span class="note">← frontend HTML/JS</span>
+│   └── <span class="dir">assets/js/</span>
+│       ├── <span class="file">api-client.js</span>
+│       ├── <span class="file">auth.js</span>
+│       ├── <span class="file">session.js</span>
+│       ├── <span class="file">recovery.js</span>
+│       ├── <span class="file">users.js</span>
+│       └── <span class="file">profile.js</span>
+│
+├── <span class="dir">frontend-react/src/</span>
+│   ├── <span class="file">main.tsx</span>
+│   ├── <span class="file">App.tsx</span>                       <span class="note">← rota /verificar-email adicionada</span>
+│   ├── <span class="dir">api/</span>  client.ts
+│   ├── <span class="dir">contexts/</span>  AuthContext.tsx
+│   ├── <span class="dir">components/</span>  Layout.tsx · ProtectedRoute.tsx
+│   └── <span class="dir">pages/</span>
+│       ├── <span class="file">Login.tsx</span>                 <span class="note">← trata erro email_nao_verificado</span>
+│       ├── <span class="new">VerificarEmail.tsx</span>         <span class="note">← NOVA: digita código recebido no e-mail</span>
+│       ├── <span class="file">Dashboard.tsx</span>
+│       ├── <span class="file">Clientes.tsx</span>
+│       ├── <span class="file">Estoque.tsx</span>
+│       ├── <span class="file">Vendas.tsx</span>
+│       ├── <span class="file">Financeiro.tsx</span>
+│       └── <span class="file">SemPermissao.tsx</span>
+│
+└── <span class="dir">documentacao/</span>
+    └── <span class="file">VORTEX_ERP_Documentacao.html</span>  <span class="note">← este arquivo</span>
+</div>
+</div>
+
+<!-- 5. FLUXOGRAMA -->
+<div class="section page-break" id="fluxograma">
+<h1>5. Fluxograma de Arquitetura</h1>
+
+<h2>5.1 Visão Macro</h2>
+<div class="flow">
+  <div class="flow-row" style="gap:16px">
+    <div class="flow-box mid">⚛️ React<br><small>localhost:5173</small></div>
+    <div class="flow-arrow">ou</div>
+    <div class="flow-box mid">📄 HTML+JS<br><small>127.0.0.1:5500</small></div>
+  </div>
+  <div class="flow-down">⬇ fetch() → http://localhost:3000</div>
+  <div class="flow-row">
+    <div class="flow-box" style="min-width:360px">⚙️ Express + TypeScript<br><small>src/index.ts → routes/*.ts → middleware/auth.ts</small></div>
+  </div>
+  <div class="flow-down">⬇ Prisma Client (queries SQL)</div>
+  <div class="flow-row">
+    <div class="flow-box db" style="min-width:360px">🐘 Supabase — PostgreSQL na Nuvem<br><small>db.inktgatsnofilqdkqhbz.supabase.co:5432</small></div>
+  </div>
+  <div class="flow-down">⬆ Retorna JSON</div>
+  <div class="flow-row">
+    <div class="flow-box green" style="min-width:360px">📦 Dados renderizados na tela do usuário</div>
+  </div>
+</div>
+
+<h2>5.2 Mapa de Todos os Endpoints</h2>
+<table>
+  <tr><th>Prefixo</th><th>Arquivo</th><th>Proteção</th><th>Endpoints</th></tr>
+  <tr><td><code>/auth</code></td><td>routes/auth.ts</td><td>🔓 Público</td><td>POST /login, /register, /logout, /verify-email*, /resend-verification*, /forgot-password, /validate-code, /reset-password</td></tr>
+  <tr><td><code>/api/users</code></td><td>routes/users.ts</td><td>🔐 admin</td><td>GET /, GET /:id, POST /, PUT /:id, DELETE /:id, PATCH /:id/status, PUT /me/password</td></tr>
+  <tr><td><code>/api/clientes</code></td><td>routes/clientes.ts</td><td>🔐 auth</td><td>GET /, GET /:id, POST /, PUT /:id, DELETE /:id</td></tr>
+  <tr><td><code>/api/estoque</code></td><td>routes/estoque.ts</td><td>🔐 auth</td><td>GET /, GET /:id, POST /, PUT /:id, DELETE /:id, PATCH /:id/quantidade</td></tr>
+  <tr><td><code>/api/financeiro</code></td><td>routes/financeiro.ts</td><td>🔐 auth</td><td>GET /, GET /:id, POST /, PUT /:id, DELETE /:id, PATCH /:id/pago</td></tr>
+  <tr><td><code>/api/vendas</code></td><td>routes/vendas.ts</td><td>🔐 auth</td><td>GET /, GET /:id, PATCH /:id/status</td></tr>
+</table>
+<p style="font-size:11px;color:#6b7280">* Novos endpoints adicionados na v2.0</p>
+</div>
+
+<!-- 6. BANCO DE DADOS -->
+<div class="section page-break" id="banco">
+<h1>6. Banco de Dados — Schema Prisma</h1>
+
+<h2>6.1 Modelo User — com novos campos de verificação</h2>
+<pre>
+model <span class="key">User</span> {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  password      String    <span class="comment">// hash bcrypt — NUNCA texto puro</span>
+  role          String    @default(<span class="str">"user"</span>)
+  status        String    @default(<span class="str">"ativo"</span>)
+  avatar        String?
+  loginAttempts Int       @default(0)
+  lockedUntil   DateTime?
+
+  <span class="comment">// ── NOVOS campos v2.0 ─────────────────────────</span>
+  emailVerified           Boolean   @default(false)
+  emailVerificationCode   String?   <span class="comment">// código de 6 dígitos</span>
+  emailVerificationExpiry DateTime? <span class="comment">// expira em 15 minutos</span>
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  passwordResetCodes PasswordResetCode[]
+}
+</pre>
+
+<h2>6.2 Todos os Modelos</h2>
+<table>
+  <tr><th>Modelo</th><th>Tabela SQL</th><th>Descrição</th></tr>
+  <tr><td>User</td><td>User</td><td>Usuários do sistema (login, roles)</td></tr>
+  <tr><td>PasswordResetCode</td><td>PasswordResetCode</td><td>Códigos de recuperação de senha</td></tr>
+  <tr><td>Funcionario</td><td>Funcionario</td><td>Funcionários da empresa (para vendas)</td></tr>
+  <tr><td>Cliente</td><td>Cliente</td><td>Clientes cadastrados</td></tr>
+  <tr><td>Produto</td><td>Produto</td><td>Produtos em estoque</td></tr>
+  <tr><td>Venda</td><td>Venda</td><td>Pedidos/vendas com status Kanban</td></tr>
+  <tr><td>ItemVenda</td><td>ItemVenda</td><td>Itens de cada venda (N:N Venda↔Produto)</td></tr>
+  <tr><td>ContaFinanceira</td><td>ContaFinanceira</td><td>Receitas e despesas</td></tr>
+</table>
+
+<h2>6.3 Comandos Prisma essenciais</h2>
+<table>
+  <tr><th>Comando</th><th>O que faz</th></tr>
+  <tr><td><code>npx prisma migrate dev --name nome</code></td><td>Aplica alterações do schema no banco (Supabase)</td></tr>
+  <tr><td><code>npx prisma generate</code></td><td>Regenera o client TypeScript após mudanças</td></tr>
+  <tr><td><code>npx prisma db seed</code></td><td>Popula o banco com dados de teste</td></tr>
+  <tr><td><code>npx prisma studio</code></td><td>Interface visual local para ver/editar dados</td></tr>
+</table>
+</div>
+
+<!-- 7. BACKEND -->
+<div class="section page-break" id="backend">
+<h1>7. Backend — Node.js + Express + TypeScript</h1>
+
+<h2>7.1 Arquivo <code>src/index.ts</code> — Servidor principal</h2>
+<pre>
+import <span class="str">'dotenv/config'</span>;       <span class="comment">// carrega .env primeiro</span>
+import express from <span class="str">'express'</span>;
+import cors from <span class="str">'cors'</span>;
+import authRoutes      from <span class="str">'./routes/auth'</span>;
+import usersRoutes     from <span class="str">'./routes/users'</span>;
+import clientesRoutes  from <span class="str">'./routes/clientes'</span>;
+import estoqueRoutes   from <span class="str">'./routes/estoque'</span>;
+import financeiroRoutes from <span class="str">'./routes/financeiro'</span>;
+import vendasRoutes    from <span class="str">'./routes/vendas'</span>;
+
+const app = express();
+app.use(cors({ origin: (origin, cb) => {
+  const ok = !origin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  cb(null, ok);
+}, credentials: true }));
+app.use(express.json());
+
+app.use(<span class="str">'/auth'</span>,          authRoutes);
+app.use(<span class="str">'/api/users'</span>,     usersRoutes);
+app.use(<span class="str">'/api/clientes'</span>,  clientesRoutes);
+app.use(<span class="str">'/api/estoque'</span>,   estoqueRoutes);
+app.use(<span class="str">'/api/financeiro'</span>, financeiroRoutes);
+app.use(<span class="str">'/api/vendas'</span>,    vendasRoutes);
+
+app.listen(3000);
+</pre>
+
+<h2>7.2 Middleware de autenticação: <code>src/middleware/auth.ts</code></h2>
+<p>Executado antes de qualquer rota protegida. Valida o JWT no header <code>Authorization: Bearer &lt;token&gt;</code>. Se inválido → retorna 401. Se válido → coloca <code>req.user = {id, email, role}</code> e continua.</p>
+</div>
+
+<!-- 8. E-MAIL -->
+<div class="section page-break" id="email">
+<h1>8. Sistema de E-mail Completo <span class="chip new">ATUALIZADO v2.0</span></h1>
+
+<h2>8.1 Configuração — Nodemailer + Gmail SMTP</h2>
+<p>O arquivo <code>src/mailer.ts</code> exporta <strong>3 funções de e-mail</strong>:</p>
+
+<table>
+  <tr><th>Função</th><th>Quando é chamada</th><th>Assunto do e-mail</th></tr>
+  <tr><td><code>sendVerificationEmail(to, code, name)</code></td><td><code>POST /auth/register</code> — cadastro de novo usuário</td><td>"Confirme seu e-mail — Vortex ERP"</td></tr>
+  <tr><td><code>sendRecoveryEmail(to, code)</code></td><td><code>POST /auth/forgot-password</code> — recuperação de senha</td><td>"Recuperação de senha — Vortex ERP"</td></tr>
+  <tr><td><code>sendPasswordChangedEmail(to, name)</code></td><td><code>POST /auth/reset-password</code> — após redefinição</td><td>"Sua senha foi alterada — Vortex ERP"</td></tr>
+</table>
+
+<h2>8.2 Como configurar o Gmail SMTP</h2>
+<ol>
+  <li>Acesse <strong>myaccount.google.com</strong></li>
+  <li>Vá em <strong>Segurança → Verificação em duas etapas</strong> (deve estar ativada)</li>
+  <li>Pesquise <strong>"Senhas de app"</strong> na barra de pesquisa da conta Google</li>
+  <li>Crie uma senha de app com nome "Vortex ERP"</li>
+  <li>Copie os 16 caracteres gerados (formato: <code>xxxx xxxx xxxx xxxx</code>)</li>
+  <li>No arquivo <code>.env</code>: <code>SMTP_PASS=xxxx xxxx xxxx xxxx</code></li>
+</ol>
+
+<div class="warn">
+  <strong>⚠️ Atenção:</strong> Use sua senha de App do Google — não a senha normal da conta. A senha normal não funciona com SMTP.
+</div>
+
+<h2>8.3 Testando o envio de e-mail</h2>
+<pre>
+<span class="comment"># Testar fluxo completo de cadastro com e-mail</span>
+curl -X POST http://localhost:3000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Teste","email":"seu@email.com","password":"Teste@123"}'
+
+<span class="comment"># Resposta esperada:</span>
+{"success":true,"message":"Conta criada! Verifique seu e-mail para ativar o acesso."}
+
+<span class="comment"># Verifique a caixa de entrada do e-mail — chegará um código de 6 dígitos</span>
+</pre>
+</div>
+
+<!-- 9. FRONTEND REACT -->
+<div class="section page-break" id="frontend-react">
+<h1>9. Frontend React + Vite + TypeScript</h1>
+
+<h2>9.1 Rotas do React (App.tsx)</h2>
+<table>
+  <tr><th>Rota</th><th>Página</th><th>Acesso</th></tr>
+  <tr><td><code>/login</code></td><td>Login.tsx</td><td>Público</td></tr>
+  <tr><td><code>/verificar-email</code></td><td>VerificarEmail.tsx <span class="chip new">NOVA</span></td><td>Público</td></tr>
+  <tr><td><code>/</code></td><td>Dashboard.tsx</td><td>🔐 Autenticado</td></tr>
+  <tr><td><code>/clientes</code></td><td>Clientes.tsx</td><td>🔐 can(clientes, view)</td></tr>
+  <tr><td><code>/estoque</code></td><td>Estoque.tsx</td><td>🔐 can(estoque, view)</td></tr>
+  <tr><td><code>/vendas</code></td><td>Vendas.tsx</td><td>🔐 can(vendas, view)</td></tr>
+  <tr><td><code>/financeiro</code></td><td>Financeiro.tsx</td><td>🔐 can(financeiro, view)</td></tr>
+  <tr><td><code>/sem-permissao</code></td><td>SemPermissao.tsx</td><td>🔐 Autenticado</td></tr>
+</table>
+
+<h2>9.2 Página de Verificação de E-mail (<code>VerificarEmail.tsx</code>)</h2>
+<p>Nova página criada na v2.0. O usuário acessa em <code>http://localhost:5173/verificar-email</code> após se cadastrar:</p>
+<ul>
+  <li>Campos: e-mail + código de 6 dígitos recebido no e-mail</li>
+  <li>Botão <strong>"Reenviar código"</strong> caso o e-mail não chegue</li>
+  <li>Ao confirmar com sucesso → redireciona para a tela de login</li>
+</ul>
+
+<h2>9.3 Erro de e-mail não verificado no Login</h2>
+<p>Se o usuário tentar fazer login sem verificar o e-mail, a tela mostra:</p>
+<pre>
+📧 E-mail não verificado. Verifique sua caixa de entrada
+e clique no código recebido antes de fazer login.
+</pre>
+</div>
+
+<!-- 10. CONEXÃO -->
+<div class="section page-break" id="conexao">
+<h1>10. Como Frontend e Backend se Conectam</h1>
+
+<h2>10.1 Cliente HTTP React (<code>src/api/client.ts</code>)</h2>
+<pre>
+const BASE_URL = <span class="str">'http://localhost:3000'</span>;
+
+<span class="comment">// Lê o token JWT do localStorage (salvo no login)</span>
+function getToken() { return localStorage.getItem(<span class="str">'vortex_token'</span>); }
+
+export const api = {
+  post: &lt;T&gt;(path: string, body: unknown) =>
+    fetch(BASE_URL + path, {
+      method: <span class="str">'POST'</span>,
+      headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>, <span class="str">'Authorization'</span>: `Bearer ${getToken()}` },
+      body: JSON.stringify(body)
+    }).then(handleResponse&lt;T&gt;),
+  <span class="comment">// get, put, patch, del — mesmo padrão</span>
+};
+</pre>
+
+<h2>10.2 Por que as portas diferentes funcionam (CORS)</h2>
+<p>O backend aceita chamadas de qualquer <code>localhost</code> em qualquer porta:</p>
+<pre>
+app.use(cors({
+  origin: (origin, cb) => {
+    const ok = !origin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+    cb(null, ok);
+  }
+}));
+</pre>
+</div>
+
+<!-- 11. AUTENTICAÇÃO -->
+<div class="section page-break" id="autenticacao">
+<h1>11. Autenticação — JWT + Verificação de E-mail</h1>
+
+<h2>11.1 Fluxo de Login (atualizado v2.0)</h2>
+<div class="flow">
+  <div class="flow-row"><div class="flow-box green">Usuário digita e-mail e senha</div></div>
+  <div class="flow-down">⬇ POST /auth/login</div>
+  <div class="flow-row" style="gap:12px">
+    <div class="flow-box red">❌ Conta bloqueada<br><small>→ 423 conta_bloqueada</small></div>
+    <div class="flow-arrow">ou</div>
+    <div class="flow-box">Busca usuário no Supabase</div>
+  </div>
+  <div class="flow-down">⬇</div>
+  <div class="flow-row" style="gap:12px">
+    <div class="flow-box red">❌ Senha errada<br><small>→ incrementa tentativas</small></div>
+    <div class="flow-arrow">ou</div>
+    <div class="flow-box purple">📧 E-mail não verificado<br><small>→ 403 email_nao_verificado</small></div>
+    <div class="flow-arrow">ou</div>
+    <div class="flow-box green">✅ Tudo OK<br><small>→ gera JWT 8h</small></div>
+  </div>
+  <div class="flow-down">⬇</div>
+  <div class="flow-row"><div class="flow-box green">Retorna {token, user} → frontend salva no localStorage</div></div>
+</div>
+
+<h2>11.2 Como funciona o bcrypt</h2>
+<pre>
+<span class="comment">// Cadastro — nunca salva senha em texto</span>
+const hash = await bcrypt.hash(<span class="str">'MinhaSenh@123'</span>, 12);
+<span class="comment">// Salva no Supabase: "$2b$12$..."</span>
+
+<span class="comment">// Login — compara sem descriptografar</span>
+const ok = await bcrypt.compare(<span class="str">'MinhaSenh@123'</span>, hash); <span class="comment">// true</span>
+</pre>
+
+<h2>11.3 Estrutura do JWT</h2>
+<pre>
+<span class="comment">// Payload armazenado no token (não criptografado, apenas assinado)</span>
+{ "id": "uuid-do-usuario", "email": "admin@vortex.com", "role": "admin", "iat": 1234567890, "exp": 1234596690 }
+
+<span class="comment">// O backend verifica a assinatura com JWT_SECRET do .env</span>
+<span class="comment">// Se alguém alterar o payload, a assinatura não bate → 401</span>
+</pre>
+</div>
+
+<!-- 12. FLUXOS -->
+<div class="section page-break" id="login-fluxo">
+<h1>12. Fluxos Completos <span class="chip new">ATUALIZADO v2.0</span></h1>
+
+<h2>12.1 Cadastro de Novo Usuário (com verificação de e-mail)</h2>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Usuário preenche o formulário de cadastro</h4><p>Nome, e-mail e senha. Frontend envia <code>POST /auth/register</code>.</p></div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Backend verifica se o e-mail já existe</h4><p>Se existir → retorna 409 <code>email_em_uso</code>. Se não → continua.</p></div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Cria o usuário com emailVerified: false</h4><p>Senha é hasheada com bcrypt (12 rounds). Gera código de 6 dígitos com validade de 15 minutos.</p></div></div>
+  <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Envia e-mail de verificação</h4><p>Via Nodemailer + Gmail SMTP. O e-mail contém o código de 6 dígitos. Retorna: <code>{"success":true, "message":"Verifique seu e-mail"}</code>.</p></div></div>
+  <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Usuário acessa /verificar-email</h4><p>Digita seu e-mail e o código recebido. Frontend envia <code>POST /auth/verify-email</code>.</p></div></div>
+  <div class="step"><div class="step-num">6</div><div class="step-body"><h4>Backend valida o código</h4><p>Verifica: código correto? Dentro do prazo? Se ok → atualiza <code>emailVerified: true</code> no Supabase. Limpa o código.</p></div></div>
+  <div class="step"><div class="step-num">7</div><div class="step-body"><h4>Usuário pode agora fazer login</h4><p>Acessa /login com e-mail e senha. O login verifica que <code>emailVerified = true</code> e gera o JWT.</p></div></div>
+</div>
+
+<h2>12.2 Login</h2>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div class="step-body"><h4>POST /auth/login com {email, password}</h4><p>Backend busca o usuário no Supabase pelo e-mail.</p></div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Verifica bloqueios</h4><p>Conta bloqueada por tentativas? → 423. Status bloqueado pelo admin? → 423.</p></div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Compara senha com bcrypt</h4><p>Errada? → incrementa <code>loginAttempts</code>. Após 5 falhas → bloqueia 15 minutos.</p></div></div>
+  <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Verifica emailVerified</h4><p>Se <code>false</code> → retorna 403 <code>email_nao_verificado</code>. Frontend orienta o usuário a verificar o e-mail.</p></div></div>
+  <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Sucesso — gera JWT de 8 horas</h4><p>Zera as tentativas. Retorna <code>{token, user}</code>. Frontend salva no localStorage e redireciona ao Dashboard.</p></div></div>
+</div>
+
+<h2>12.3 Recuperação de Senha</h2>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div class="step-body"><h4>POST /auth/forgot-password com {email}</h4><p>Sempre retorna sucesso (evita enumerar e-mails). Gera código de 6 dígitos, salva em <code>PasswordResetCode</code>, envia e-mail.</p></div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body"><h4>POST /auth/validate-code com {email, code}</h4><p>Valida: correto? Não usado? Dentro do prazo? Se ok → retorna <code>resetToken</code> JWT (15 min, purpose: 'password_reset').</p></div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body"><h4>POST /auth/reset-password com {resetToken, newPassword}</h4><p>Verifica o resetToken. Gera novo hash bcrypt. Atualiza a senha no Supabase. Envia e-mail de confirmação "sua senha foi alterada".</p></div></div>
+</div>
+
+<h2>12.4 Como o Admin desbloqueia uma conta</h2>
+<p>Após 5 tentativas erradas, a conta fica bloqueada por 15 minutos. O admin pode desbloquear manualmente:</p>
+<ol>
+  <li>Acessar a página <strong>Usuários</strong> (somente admin)</li>
+  <li>Clicar em <strong>"Desbloquear"</strong> no usuário → chama <code>PATCH /api/users/:id/status</code></li>
+  <li>Backend zera <code>loginAttempts = 0</code> e <code>lockedUntil = null</code> no Supabase</li>
+</ol>
+<div class="ok">
+  <strong>Alternativa direta no Supabase:</strong> Painel do Supabase → Table Editor → tabela User → edite os campos <code>loginAttempts</code> (0) e <code>lockedUntil</code> (null) do usuário.
+</div>
+</div>
+
+<!-- 13. RBAC -->
+<div class="section page-break" id="rbac">
+<h1>13. Controle de Acesso por Perfil (RBAC)</h1>
+<table>
+  <tr><th>Role</th><th>Clientes</th><th>Estoque</th><th>Vendas</th><th>Financeiro</th><th>Usuários</th></tr>
+  <tr><td><strong>admin</strong></td><td>✅ Tudo</td><td>✅ Tudo</td><td>✅ Tudo</td><td>✅ Tudo</td><td>✅ Tudo</td></tr>
+  <tr><td><strong>manager</strong></td><td>Ver/Criar/Editar</td><td>Ver/Criar/Editar</td><td>Ver/Criar/Editar</td><td>Ver/Criar/Editar</td><td>Ver/Criar/Editar</td></tr>
+  <tr><td><strong>user</strong></td><td>👁️ Só ver</td><td>👁️ Só ver</td><td>👁️ Ver+Criar</td><td>👁️ Só ver</td><td>❌ Sem acesso</td></tr>
+</table>
+
+<p>O RBAC é aplicado em <strong>dois lugares</strong>:</p>
+<ul>
+  <li><strong>Backend</strong>: middleware <code>requireRole()</code> bloqueia chamadas não autorizadas — segurança real</li>
+  <li><strong>Frontend</strong>: função <code>can(module, action)</code> no AuthContext esconde botões — apenas UX</li>
+</ul>
+</div>
+
+<!-- 14. AMBIENTE -->
+<div class="section page-break" id="ambiente">
+<h1>14. Configurações de Ambiente (.env)</h1>
+<pre>
+<span class="comment"># ── Banco de Dados — SUPABASE ─────────────────────────────────</span>
+DATABASE_URL=<span class="str">"postgresql://postgres:%40SuaSenha@db.SEU_PROJECT_ID.supabase.co:5432/postgres"</span>
+<span class="comment"># Nota: @ na senha deve ser URL-encoded como %40</span>
+
+<span class="comment"># ── JWT ───────────────────────────────────────────────────────</span>
+JWT_SECRET=<span class="str">string_aleatoria_com_64_caracteres_hexadecimais</span>
+JWT_EXPIRES_IN=<span class="str">8h</span>
+
+<span class="comment"># ── E-mail via Gmail SMTP ─────────────────────────────────────</span>
+SMTP_HOST=<span class="str">smtp.gmail.com</span>
+SMTP_PORT=<span class="str">587</span>
+SMTP_USER=<span class="str">seu-email@gmail.com</span>
+SMTP_PASS=<span class="str">xxxx xxxx xxxx xxxx</span>    <span class="comment"># senha de APP Google</span>
+
+<span class="comment"># ── CORS ─────────────────────────────────────────────────────</span>
+FRONTEND_URL=<span class="str">http://127.0.0.1:5500</span>
+</pre>
+
+<div class="danger">
+  <strong>🔴 NUNCA envie o .env ao GitHub!</strong> Ele contém senha do banco e chave JWT. Confirme que <code>.env</code> está no <code>.gitignore</code>.
+</div>
+</div>
+
+<!-- 15. SEGURANÇA -->
+<div class="section page-break" id="seguranca">
+<h1>15. Segurança</h1>
+
+<h2>✅ O que está protegido</h2>
+<table>
+  <tr><th>Proteção</th><th>Implementação</th></tr>
+  <tr><td>Senhas hasheadas</td><td>bcrypt 12 rounds — impossível reverter</td></tr>
+  <tr><td>JWT assinado</td><td>Qualquer alteração no token o invalida</td></tr>
+  <tr><td>Bloqueio por tentativas</td><td>5 falhas → bloqueio 15 min no Supabase</td></tr>
+  <tr><td>Verificação de e-mail</td><td>Novo usuário não faz login sem confirmar o e-mail <span class="chip new">v2.0</span></td></tr>
+  <tr><td>Enumeração de e-mail</td><td>forgot-password sempre retorna sucesso independente do e-mail existir</td></tr>
+  <tr><td>RBAC no backend</td><td>Servidor verifica o role em cada rota — frontend não é suficiente</td></tr>
+  <tr><td>Token de propósito</td><td>resetToken tem campo purpose:'password_reset' — não vira token de login</td></tr>
+  <tr><td>Banco na nuvem</td><td>Supabase gerencia backups, patches de segurança e HA automaticamente</td></tr>
+</table>
+
+<h2>⚠️ Vulnerabilidades a corrigir</h2>
+
+<div class="danger">
+  <strong>🔴 CRÍTICO — JWT_SECRET fraco:</strong> Gere com:<br>
+  <code>node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"</code>
+</div>
+
+<div class="warn">
+  <strong>🟡 Sem HTTPS em produção:</strong> Instale certificado SSL (Let's Encrypt) + Nginx. Sem HTTPS, o JWT trafega exposto.
+</div>
+
+<div class="warn">
+  <strong>🟡 Sem rate limiting:</strong> Instale <code>express-rate-limit</code> para limitar tentativas por IP.
+</div>
+
+<div class="warn">
+  <strong>🟡 CORS aberto para localhost:</strong> Em produção, altere o CORS para aceitar apenas o domínio real:<br>
+  <code>app.use(cors({ origin: 'https://seu-dominio.com' }))</code>
+</div>
+</div>
+
+<!-- 16. MÓDULOS -->
+<div class="section page-break" id="modulos">
+<h1>16. Módulos do ERP</h1>
+
+<h2>Clientes</h2>
+<p>CRUD completo com busca em tempo real por nome, e-mail, telefone e CPF/CNPJ. A busca não faz chamada ao servidor — filtra os dados já carregados no React com <code>.filter()</code>.</p>
+
+<h2>Estoque</h2>
+<p>Controle de produtos com badges de status por quantidade: <span class="chip red">Sem estoque</span> = 0, <span class="chip amber">Crítico</span> ≤5, <span class="chip blue">Baixo</span> ≤15, <span class="chip green">Normal</span> >15. O ajuste de quantidade usa <code>PATCH /api/estoque/:id/quantidade</code> com campo <code>delta</code> (positivo ou negativo).</p>
+
+<h2>Vendas — Kanban</h2>
+<p>Quadro com 4 colunas: Aberto → Em Andamento → Concluído / Cancelado. Mover um card: <code>PATCH /api/vendas/:id/status</code>. Clicar em "Ver" abre modal com detalhes dos itens.</p>
+
+<h2>Financeiro</h2>
+<p>Receitas e despesas com resumo de saldo no topo. Filtro por tipo sem chamada extra. Botão "✓ Pagar" alterna o status de pagamento.</p>
+</div>
+
+<!-- 17. SEED -->
+<div class="section page-break" id="seed">
+<h1>17. Dados de Teste (Seed)</h1>
+
+<table>
+  <tr><th>Tipo</th><th>Qtd</th><th>Detalhe</th></tr>
+  <tr><td>Usuários</td><td>4</td><td>Todos com <code>emailVerified: true</code> para poder fazer login</td></tr>
+  <tr><td>Funcionários</td><td>4</td><td>Vendedor, estoquista, financeiro, gerente</td></tr>
+  <tr><td>Clientes</td><td>6</td><td>Com CPF/CNPJ, telefone e e-mail</td></tr>
+  <tr><td>Produtos</td><td>8</td><td>Categorias e quantidades variadas</td></tr>
+  <tr><td>Vendas</td><td>5</td><td>Em diferentes status do Kanban</td></tr>
+  <tr><td>Contas Financeiras</td><td>8</td><td>Mix receitas/despesas, algumas pagas</td></tr>
+</table>
+
+<h2>Credenciais de teste</h2>
+<table>
+  <tr><th>E-mail</th><th>Senha</th><th>Role</th></tr>
+  <tr><td>admin@vortex.com</td><td>Admin@123</td><td>admin — acesso total</td></tr>
+  <tr><td>gerente@vortex.com</td><td>Gerente@123</td><td>manager — sem deletar</td></tr>
+  <tr><td>joao@vortex.com</td><td>User@123</td><td>user — só visualiza</td></tr>
+</table>
+</div>
+
+<!-- 18. COMO RECRIAR -->
+<div class="section page-break" id="refazer">
+<h1>18. Como Recriar o Sistema do Zero</h1>
+
+<h2>Pré-requisitos</h2>
+<ul>
+  <li>✅ <strong>Node.js 18+</strong> — nodejs.org</li>
+  <li>✅ Conta no <strong>Supabase</strong> — supabase.com (gratuito)</li>
+  <li>✅ Conta <strong>Google</strong> com verificação em duas etapas (para SMTP)</li>
+  <li>✅ <strong>VS Code</strong> com extensão Prisma</li>
+</ul>
+
+<h2>Passo a Passo</h2>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Criar projeto no Supabase</h4><p>supabase.com → New Project → copie a <strong>Connection String URI</strong> em Settings → Database.</p></div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Criar o projeto backend</h4><p><code>mkdir VORTEX_ERP && cd VORTEX_ERP && npm init -y</code></p></div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Instalar dependências</h4><p><code>npm install express @prisma/client bcrypt jsonwebtoken nodemailer cors dotenv</code><br><code>npm install --save-dev typescript ts-node prisma @types/express @types/node @types/bcrypt @types/jsonwebtoken @types/nodemailer @types/cors</code></p></div></div>
+  <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Configurar Prisma e .env</h4><p><code>npx prisma init</code> → edite o <code>.env</code> com a DATABASE_URL do Supabase (encode o @ da senha como %40).</p></div></div>
+  <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Criar schema.prisma</h4><p>Copie todos os modelos do capítulo 6. Inclua os campos <code>emailVerified</code>, <code>emailVerificationCode</code>, <code>emailVerificationExpiry</code> no User.</p></div></div>
+  <div class="step"><div class="step-num">6</div><div class="step-body"><h4>Rodar migration no Supabase</h4><p><code>npx prisma migrate dev --name inicio</code> → cria todas as tabelas diretamente no Supabase.</p></div></div>
+  <div class="step"><div class="step-num">7</div><div class="step-body"><h4>Criar código do backend</h4><p>Na ordem: <code>src/prisma.ts</code> → <code>src/mailer.ts</code> (3 funções) → <code>src/middleware/auth.ts</code> → <code>src/routes/*.ts</code> → <code>src/index.ts</code></p></div></div>
+  <div class="step"><div class="step-num">8</div><div class="step-body"><h4>Seed e teste</h4><p><code>npx prisma db seed</code> → <code>npm run dev</code> → teste com curl ou Postman.</p></div></div>
+  <div class="step"><div class="step-num">9</div><div class="step-body"><h4>Criar frontend React</h4><p><code>npm create vite@latest frontend-react -- --template react-ts</code><br><code>cd frontend-react && npm install && npm install react-router-dom</code></p></div></div>
+  <div class="step"><div class="step-num">10</div><div class="step-body"><h4>Criar páginas React</h4><p><code>api/client.ts</code> → <code>contexts/AuthContext.tsx</code> → <code>components/</code> → <code>pages/</code> (incluindo <code>VerificarEmail.tsx</code>) → <code>App.tsx</code></p></div></div>
+  <div class="step"><div class="step-num">11</div><div class="step-body"><h4>Iniciar tudo</h4><p>Terminal 1: <code>cd VORTEX_ERP && npm run dev</code><br>Terminal 2: <code>cd frontend-react && npm run dev</code><br>Acesse: <strong>http://localhost:5173</strong></p></div></div>
+</div>
+
+<h2>Comandos de execução diária</h2>
+<table>
+  <tr><th>Terminal</th><th>Pasta</th><th>Comando</th><th>Resultado</th></tr>
+  <tr><td>1</td><td>VORTEX_ERP/</td><td><code>npm run dev</code></td><td>Backend na porta 3000 → Supabase</td></tr>
+  <tr><td>2</td><td>VORTEX_ERP/frontend-react/</td><td><code>npm run dev</code></td><td>React na porta 5173</td></tr>
+  <tr><td>Opcional</td><td>VORTEX_ERP/</td><td><code>npx prisma studio</code></td><td>Interface visual do banco Supabase</td></tr>
+</table>
+</div>
+
+</div><!-- fim .content -->
+
+<footer>
+  <p>⚡ <strong>VORTEX ERP</strong> — Documentação Técnica Completa · Versão 2.0 · 2026</p>
+  <p style="margin-top:6px">Stack: Node.js · Express · TypeScript · Prisma · <strong>Supabase PostgreSQL</strong> · React 19 · Vite · JWT · bcrypt · Nodemailer + Gmail</p>
+  <p style="margin-top:12px; font-size:11px">
+    Para gerar o PDF: abra no Chrome/Edge → Ctrl+P → Salvar como PDF → Margens: Mínimas → ✅ Habilitar gráficos de fundo
+  </p>
+</footer>
+
+<div class="no-print" style="position:fixed;bottom:24px;right:24px;z-index:999">
+  <button onclick="window.print()" style="padding:14px 24px;background:#4f46e5;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(79,70,229,.4)">
+    🖨️ Gerar PDF
+  </button>
+</div>
+
+</body>
+</html>

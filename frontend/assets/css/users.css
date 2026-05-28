@@ -1,0 +1,139 @@
+/* ============================================================
+   users.css — Estilos do módulo de gerenciamento de usuários
+   Tabelas, cards de usuário, avatares e controles de permissão
+   ============================================================ */
+
+/* Tabela de usuários */
+.users-table-wrapper {
+  background-color: var(--bg-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.users-table thead {
+  background-color: var(--bg-body);
+}
+
+.users-table th {
+  padding: 0.75rem var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.users-table td {
+  padding: 0.875rem var(--spacing-md);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.users-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.users-table tbody tr:hover {
+  background-color: var(--bg-body);
+}
+
+/* Badge de role/status */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.badge--admin { background-color: #ede9fe; color: #7c3aed; }
+.badge--manager { background-color: #dbeafe; color: #1d4ed8; }
+.badge--user { background-color: #f0fdf4; color: #15803d; }
+.badge--active { background-color: #dcfce7; color: #16a34a; }
+.badge--inactive { background-color: #f3f4f6; color: #6b7280; }
+.badge--blocked { background-color: #fee2e2; color: #dc2626; }
+
+/* User info inline */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.user-info__name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.user-info__email {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* Ações da tabela */
+.table-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 0.875rem;
+}
+
+.btn-icon:hover {
+  background-color: var(--bg-body);
+}
+
+.btn-icon--danger:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+/* Barra de busca e filtros */
+.users-toolbar {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
