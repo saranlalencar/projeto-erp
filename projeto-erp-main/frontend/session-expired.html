@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sessão Expirada — Vortex ERP</title>
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/login.css" />
+</head>
+<body class="auth-page">
+  <!-- Página exibida quando a sessão do usuário expirou por inatividade -->
+  <main class="auth-container">
+    <div class="auth-card auth-card--warning">
+      <div class="auth-logo">
+        <img src="assets/img/logo.svg" alt="Vortex ERP" />
+      </div>
+      <div class="status-icon status-icon--expired">⏱️</div>
+      <h1>Sessão expirada</h1>
+      <p class="auth-description">Sua sessão expirou por inatividade. Por segurança, faça login novamente para continuar.</p>
+      <a href="login.html" class="btn btn-primary">Fazer login novamente</a>
+    </div>
+  </main>
+
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/session.js"></script>
+</body>
+</html>

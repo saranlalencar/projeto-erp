@@ -1,0 +1,26 @@
+[
+  {
+    "id": "audit-001",
+    "action": "login",
+    "userId": "1",
+    "userEmail": "admin@vortex.com",
+    "data": { "email": "admin@vortex.com" },
+    "timestamp": "2025-05-20T08:00:00.000Z"
+  },
+  {
+    "id": "audit-002",
+    "action": "user_created",
+    "userId": "1",
+    "userEmail": "admin@vortex.com",
+    "data": { "targetId": "3" },
+    "timestamp": "2025-05-20T08:15:00.000Z"
+  },
+  {
+    "id": "audit-003",
+    "action": "logout",
+    "userId": "1",
+    "userEmail": "admin@vortex.com",
+    "data": {},
+    "timestamp": "2025-05-20T17:00:00.000Z"
+  }
+]

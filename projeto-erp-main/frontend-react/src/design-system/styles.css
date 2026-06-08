@@ -1,0 +1,5 @@
+/* VORTEX ERP — Design System
+   Global entry point. Consumers link THIS file only.
+   Keep this as @import lines only — no rules here. */
+
+/* tokens são importados diretamente em main.tsx para evitar bug de resolução do postcss-import no Vite 8 */

@@ -1,0 +1,31 @@
+{
+  "roles": {
+    "admin": {
+      "users":   ["view", "create", "edit", "delete", "block"],
+      "finance": ["view", "create", "edit", "delete"],
+      "stock":   ["view", "create", "edit", "delete"],
+      "sales":   ["view", "create", "edit", "delete"],
+      "reports": ["view", "export"],
+      "profile": ["view", "edit"],
+      "audit":   ["view"]
+    },
+    "manager": {
+      "users":   ["view", "create", "edit"],
+      "finance": ["view", "create", "edit"],
+      "stock":   ["view", "create", "edit"],
+      "sales":   ["view", "create", "edit"],
+      "reports": ["view", "export"],
+      "profile": ["view", "edit"],
+      "audit":   []
+    },
+    "user": {
+      "users":   [],
+      "finance": ["view"],
+      "stock":   ["view"],
+      "sales":   ["view", "create"],
+      "reports": ["view"],
+      "profile": ["view", "edit"],
+      "audit":   []
+    }
+  }
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acesso Não Autorizado — Vortex ERP</title>
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/login.css" />
+</head>
+<body class="auth-page">
+  <!-- Página exibida quando o usuário tenta acessar recurso sem permissão -->
+  <main class="auth-container">
+    <div class="auth-card auth-card--error">
+      <div class="auth-logo">
+        <img src="assets/img/logo.svg" alt="Vortex ERP" />
+      </div>
+      <div class="status-icon status-icon--unauthorized">🚫</div>
+      <h1>Acesso não autorizado</h1>
+      <p class="auth-description">Você não tem permissão para acessar este recurso. Solicite acesso ao administrador do sistema.</p>
+      <a href="javascript:history.back()" class="btn btn-outline">← Voltar</a>
+    </div>
+  </main>
+
+  <script src="assets/js/session.js"></script>
+  <script src="assets/js/permissions.js"></script>
+</body>
+</html>

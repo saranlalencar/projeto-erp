@@ -1,0 +1,65 @@
+/* VORTEX ERP — Color tokens
+   Corporate Navy + Slate. Light mode only. */
+
+:root {
+  /* ── Base palette ──────────────────────────────── */
+  /* Primary — Corporate Blue */
+  --blue-700: #1e40af;   /* primary */
+  --blue-800: #1d4ed8;   /* primary hover (brighter) */
+  --blue-900: #1e3a8a;   /* sidebar active item */
+  --blue-100: #dbeafe;   /* primary light / tint */
+
+  /* Slate neutrals */
+  --slate-950: #0f172a;  /* sidebar bg / ink text */
+  --slate-900: #111827;
+  --slate-700: #334155;
+  --slate-500: #64748b;  /* muted text */
+  --slate-400: #94a3b8;
+  --slate-300: #cbd5e1;
+  --slate-200: #e2e8f0;  /* borders */
+  --slate-100: #f1f5f9;  /* page bg */
+  --slate-50:  #f8fafc;  /* subtle fill / table head */
+  --white:     #ffffff;
+
+  /* Semantic — Success */
+  --success-bg:   #dcfce7;
+  --success-text: #16a34a;
+  /* Semantic — Warning */
+  --warning-bg:   #fef9c3;
+  --warning-text: #d97706;
+  /* Semantic — Danger */
+  --danger-bg:    #fee2e2;
+  --danger-text:  #dc2626;
+  /* Semantic — Info (reuses primary tint) */
+  --info-bg:      #dbeafe;
+  --info-text:    #1e40af;
+
+  /* ── Semantic aliases ──────────────────────────── */
+  --color-primary:        var(--blue-700);
+  --color-primary-hover:  var(--blue-800);
+  --color-primary-tint:   var(--blue-100);
+  --color-primary-active: var(--blue-900);
+
+  --bg-page:       var(--slate-100);
+  --bg-sidebar:    var(--slate-950);
+  --surface-card:  var(--white);
+  --surface-sunken: var(--slate-50);
+
+  --border-default: var(--slate-200);
+  --border-strong:  var(--slate-300);
+
+  --text-strong:  var(--slate-950);   /* headings / ink */
+  --text-body:    var(--slate-700);   /* body */
+  --text-muted:   var(--slate-500);   /* secondary / labels */
+  --text-on-primary: var(--white);
+
+  /* Sidebar-specific (on dark) */
+  --sidebar-text:        #cbd5e1;
+  --sidebar-text-active: var(--white);
+  --sidebar-hover-bg:    rgba(255, 255, 255, 0.06);
+  --sidebar-active-bg:   var(--blue-900);
+  --sidebar-border:      rgba(255, 255, 255, 0.08);
+
+  /* Focus ring */
+  --focus-ring: rgba(30, 64, 175, 0.35);
+}

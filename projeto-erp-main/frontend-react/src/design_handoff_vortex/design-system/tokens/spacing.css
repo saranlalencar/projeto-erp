@@ -1,0 +1,40 @@
+/* VORTEX ERP — Spacing, radius, shadow, layout tokens */
+
+:root {
+  /* ── Spacing scale (4px base) ──────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;   /* content padding */
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Radii ─────────────────────────────────────── */
+  --radius-sm:   4px;
+  --radius-md:   6px;    /* buttons, inputs */
+  --radius-lg:   8px;    /* cards, surfaces */
+  --radius-xl:   12px;   /* modals, large panels */
+  --radius-pill: 9999px; /* badges, avatars */
+
+  /* ── Shadows (subtle, corporate) ───────────────── */
+  --shadow-xs:  0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm:  0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md:  0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg:  0 10px 28px rgba(15, 23, 42, 0.12);
+  --shadow-topbar: 0 1px 3px rgba(15, 23, 42, 0.05);
+
+  /* ── Layout ────────────────────────────────────── */
+  --sidebar-width: 240px;
+  --topbar-height: 64px;
+  --content-padding: 32px;
+  --content-max: 1280px;
+
+  /* ── Motion ────────────────────────────────────── */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --duration-fast: 0.15s; /* @kind other */
+  --duration-base: 0.2s; /* @kind other */
+}

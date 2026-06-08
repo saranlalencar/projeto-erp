@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Vortex ERP</title>
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/darkmode.css" />
+  <link rel="stylesheet" href="assets/css/dashboard.css" />
+  <link rel="stylesheet" href="assets/css/responsive.css" />
+  <style>
+    /* Sidebar */
+    .sidebar-logo {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-logo h2 {
+      color: #fff;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .sidebar-logo span { color: #a5b4fc; }
+
+    .sidebar-user {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sidebar-user__avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: #4f46e5;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .sidebar-user__name { font-size: 0.875rem; font-weight: 600; color: #fff; }
+    .sidebar-user__role { font-size: 0.75rem; color: #a5b4fc; }
+
+    .sidebar-nav { padding: 12px 0; flex: 1; }
+    .sidebar-nav__item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 20px;
+      color: #c7d2fe;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .sidebar-nav__item:hover, .sidebar-nav__item.active {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border-left-color: #a5b4fc;
+      text-decoration: none;
+    }
+    .sidebar-nav__item .nav-icon { font-size: 1.1rem; width: 20px; text-align: center; }
+    .sidebar-nav__section {
+      padding: 16px 20px 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #6366f1;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-logout {
+      width: 100%; padding: 10px;
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #fca5a5;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-logout:hover { background: rgba(239,68,68,0.3); color: #fff; }
+
+    /* Topbar */
+    .topbar-title { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .darkmode-toggle {
+      background: none; border: 1px solid var(--border-color);
+      border-radius: 8px; padding: 6px 12px;
+      cursor: pointer; font-size: 0.875rem;
+      color: var(--text-secondary);
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .darkmode-toggle:hover { background: var(--bg-body); }
+
+    /* Metric cards */
+    .metric-card__icon.purple { background: #ede9fe; }
+    .metric-card__icon.green  { background: #d1fae5; }
+    .metric-card__icon.blue   { background: #dbeafe; }
+    .metric-card__icon.amber  { background: #fef3c7; }
+
+    /* Welcome card */
+    .welcome-card {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      border-radius: 12px;
+      padding: 28px 32px;
+      color: #fff;
+      margin-bottom: 28px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .welcome-card h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+    .welcome-card p { font-size: 0.9rem; opacity: 0.85; }
+    .welcome-card__emoji { font-size: 3rem; }
+
+    /* Tabela de usuários */
+    .card {
+      background: var(--bg-surface);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-header h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
+    .card-body { padding: 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; padding: 12px 20px;
+      font-size: 0.75rem; font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      background: var(--bg-body);
+      border-bottom: 1px solid var(--border-color);
+    }
+    td {
+      padding: 14px 20px;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-color);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg-body); }
+
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .badge-admin    { background: #ede9fe; color: #5b21b6; }
+    .badge-manager  { background: #dbeafe; color: #1d4ed8; }
+    .badge-user     { background: #f3f4f6; color: #374151; }
+    .badge-ativo    { background: #d1fae5; color: #065f46; }
+    .badge-bloqueado{ background: #fee2e2; color: #991b1b; }
+
+    .loading-text {
+      text-align: center; padding: 32px;
+      color: var(--text-muted); font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="app-sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <h2>⚡ Vortex <span>ERP</span></h2>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="sidebar-user__avatar" id="user-initials">?</div>
+      <div>
+        <div class="sidebar-user__name" id="user-name">Carregando...</div>
+        <div class="sidebar-user__role" id="user-role"></div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="nav-menu">
+      <div class="sidebar-nav__section">Principal</div>
+      <a class="sidebar-nav__item active" href="index.html">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+
+      <div class="sidebar-nav__section" id="nav-section-cadastros">Cadastros</div>
+      <a class="sidebar-nav__item" href="#" id="nav-clientes">
+        <span class="nav-icon">👥</span> Clientes
+      </a>
+      <a class="sidebar-nav__item" href="#" id="nav-estoque">
+        <span class="nav-icon">📦</span> Estoque
+      </a>
+
+      <div class="sidebar-nav__section">Financeiro</div>
+      <a class="sidebar-nav__item" href="#" id="nav-financeiro">
+        <span class="nav-icon">💰</span> Financeiro
+      </a>
+
+      <div class="sidebar-nav__section" id="nav-section-admin" style="display:none">Administração</div>
+      <a class="sidebar-nav__item" href="#" id="nav-users" style="display:none">
+        <span class="nav-icon">🔐</span> Usuários
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btn-logout">
+        🚪 Sair do sistema
+      </button>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="app-topbar">
+    <span class="topbar-title" id="page-title">Dashboard</span>
+    <div class="topbar-right">
+      <button class="darkmode-toggle" onclick="DarkMode.toggle()">
+        <span class="darkmode-toggle__icon">🌙</span>
+        <span class="darkmode-toggle__label">Modo escuro</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <main class="app-content">
+
+    <!-- Boas-vindas -->
+    <div class="welcome-card">
+      <div>
+        <h2 id="welcome-title">Olá, Administrador! 👋</h2>
+        <p>Bem-vindo ao Vortex ERP. Aqui está um resumo do sistema.</p>
+      </div>
+      <div class="welcome-card__emoji">⚡</div>
+    </div>
+
+    <!-- Métricas -->
+    <div class="metrics-grid" id="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-card__icon purple">👤</div>
+        <div>
+          <div class="metric-card__value" id="metric-users">—</div>
+          <div class="metric-card__label">Usuários</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card__icon green">👥</div>
+        <div>
+          <div class="metric-card__value" id="metric-clientes">—</div>
+          <div class="metric-card__label">Clientes</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card__icon blue">📦</div>
+        <div>
+          <div class="metric-card__value" id="metric-produtos">—</div>
+          <div class="metric-card__label">Produtos em estoque</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card__icon amber">💰</div>
+        <div>
+          <div class="metric-card__value" id="metric-contas">—</div>
+          <div class="metric-card__label">Contas financeiras</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela de usuários (apenas admin/manager) -->
+    <div class="card" id="card-users" style="display:none">
+      <div class="card-header">
+        <h3>👤 Usuários do sistema</h3>
+      </div>
+      <div class="card-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Perfil</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="table-users">
+            <tr><td colspan="4" class="loading-text">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Scripts — ordem importa! -->
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/darkmode.js"></script>
+<script src="assets/js/api-client.js"></script>
+<script src="assets/js/permissions.js"></script>
+<script src="assets/js/users.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/routes.js"></script>
+<script src="assets/js/app.js"></script>
+
+<script>
+  // ── Inicialização do Dashboard ──────────────────────────────
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Verificar sessão
+    const user = Session.getUser();
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    // Preencher dados do usuário na sidebar
+    document.getElementById('user-name').textContent = user.name;
+    document.getElementById('user-role').textContent =
+      { admin: 'Administrador', manager: 'Gerente', user: 'Usuário' }[user.role] || user.role;
+    document.getElementById('user-initials').textContent =
+      user.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+    document.getElementById('welcome-title').textContent = `Olá, ${user.name.split(' ')[0]}! 👋`;
+
+    // Mostrar menu de admin se tiver permissão
+    if (Permissions.can('users', 'view')) {
+      document.getElementById('nav-section-admin').style.display = '';
+      document.getElementById('nav-users').style.display = '';
+      document.getElementById('card-users').style.display = '';
+      loadUsers();
+    }
+
+    // Carregar métricas
+    loadMetrics();
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', () => Auth.logout());
+  });
+
+  // ── Métricas ────────────────────────────────────────────────
+  async function loadMetrics() {
+    try {
+      const [clientes, produtos, contas] = await Promise.all([
+        ApiClient.get('/api/clientes').catch(() => []),
+        ApiClient.get('/api/estoque').catch(() => []),
+        ApiClient.get('/api/financeiro').catch(() => []),
+      ]);
+
+      document.getElementById('metric-clientes').textContent = clientes.length;
+      document.getElementById('metric-produtos').textContent = produtos.length;
+      document.getElementById('metric-contas').textContent = contas.length;
+    } catch { /* silencioso */ }
+
+    // Usuários (só admin/manager)
+    if (Permissions.can('users', 'view')) {
+      try {
+        const users = await ApiClient.get('/api/users').catch(() => []);
+        document.getElementById('metric-users').textContent = users.length;
+      } catch { }
+    } else {
+      document.getElementById('metric-users').textContent = '—';
+    }
+  }
+
+  // ── Tabela de usuários ──────────────────────────────────────
+  async function loadUsers() {
+    const tbody = document.getElementById('table-users');
+    try {
+      const users = await ApiClient.get('/api/users');
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td><strong>${escHtml(u.name)}</strong></td>
+          <td style="color:var(--text-secondary)">${escHtml(u.email)}</td>
+          <td><span class="badge badge-${u.role}">${
+            { admin: 'Admin', manager: 'Gerente', user: 'Usuário' }[u.role] || u.role
+          }</span></td>
+          <td><span class="badge badge-${u.status}">${
+            u.status === 'ativo' ? '✅ Ativo' : '🔒 Bloqueado'
+          }</span></td>
+        </tr>
+      `).join('');
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="4" class="loading-text">Erro ao carregar usuários.</td></tr>';
+    }
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+
+</body>
+</html>
