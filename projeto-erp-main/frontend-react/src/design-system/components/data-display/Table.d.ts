@@ -27,6 +27,8 @@ export interface TableProps<T = any> {
   onRowClick?: (row: T) => void;
   /** Empty-state message. */
   empty?: React.ReactNode;
+  /** Set of row keys to highlight with a brief gray animation (from notification navigation). */
+  highlightedKeys?: Set<string | number>;
 }
 
 /** ERP list table: uppercase slate header, hairline dividers, row hover. */

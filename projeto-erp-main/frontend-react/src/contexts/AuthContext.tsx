@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import { api } from '../api/client';
 
-export type Role = 'admin' | 'manager' | 'user';
+export type Role = 'admin' | 'vendedor';
 
 export interface User {
   id: string;
@@ -31,15 +31,8 @@ const PERMISSIONS: Record<Role, Record<string, string[]>> = {
     vendas:     ['view', 'create', 'edit', 'delete'],
     financeiro: ['view', 'create', 'edit', 'delete'],
   },
-  manager: {
-    users:      ['view', 'create', 'edit'],
-    clientes:   ['view', 'create', 'edit'],
-    estoque:    ['view', 'create', 'edit'],
-    vendas:     ['view', 'create', 'edit'],
-    financeiro: ['view', 'create', 'edit'],
-  },
-  user: {
-    clientes:   ['view'],
+  vendedor: {
+    clientes:   ['view', 'create'],
     estoque:    ['view'],
     vendas:     ['view', 'create'],
     financeiro: ['view'],
@@ -52,27 +45,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function carregarPerfil() {
-    try {
-      const perfil = await api.get<User>('/auth/me');
-      setUser(perfil);
-    } catch {
-      setUser(null);
-    }
-    setLoading(false);
-  }
-
   useEffect(() => {
-    // Verificar sessão existente
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) carregarPerfil();
-      else setLoading(false);
-    });
-
-    // Ouvir mudanças de auth (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && event !== 'PASSWORD_RECOVERY') carregarPerfil();
-      else if (!session) { setUser(null); setLoading(false); }
+      // Ignora eventos de recuperação de senha — não loga automaticamente
+      if (event === 'PASSWORD_RECOVERY') return;
+
+      if (session?.user) {
+        const su = session.user;
+
+        // Define usuário imediatamente a partir da sessão Supabase (sem depender do backend)
+        const metaRole = su.user_metadata?.role as Role | undefined;
+        setUser({
+          id: su.id,
+          name: (su.user_metadata?.name as string) || su.email?.split('@')[0] || 'Usuário',
+          email: su.email!,
+          role: metaRole ?? 'user',
+          status: 'ativo',
+          avatar: null,
+        });
+        setLoading(false);
+
+        // Enriquece com o perfil real do backend (role, avatar etc.) em segundo plano
+        api.get<User>('/auth/me')
+          .then(setUser)
+          .catch(() => { /* mantém dados da sessão se backend indisponível */ });
+      } else {
+        setUser(null);
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -82,9 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function login(email: string, password: string): Promise<{ success: boolean; error?: string }> {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (!error) return { success: true };
-
     if (error.message.includes('Email not confirmed')) return { success: false, error: 'email_nao_verificado' };
-    if (error.message.includes('Invalid login credentials')) return { success: false, error: 'credenciais_invalidas' };
     return { success: false, error: 'credenciais_invalidas' };
   }
 

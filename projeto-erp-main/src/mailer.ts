@@ -32,7 +32,7 @@ export async function sendVerificationEmail(to: string, code: string, name: stri
     subject: 'Confirme seu e-mail — Vortex ERP',
     html: `
       <div style="${baseStyle}">
-        <h2 style="color:#1e1b4b; margin-bottom:4px;">⚡ Vortex ERP</h2>
+        <h2 style="color:#1e1b4b; margin-bottom:4px;">Vortex ERP</h2>
         <h3 style="color:#374151; font-weight:500; margin-bottom:16px;">Confirme seu e-mail</h3>
         <p style="color:#555;">Olá, <strong>${name}</strong>!</p>
         <p style="color:#555; margin-bottom:8px;">
@@ -55,7 +55,7 @@ export async function sendRecoveryEmail(to: string, code: string): Promise<void>
     subject: 'Recuperação de senha — Vortex ERP',
     html: `
       <div style="${baseStyle}">
-        <h2 style="color:#1e1b4b; margin-bottom:4px;">⚡ Vortex ERP</h2>
+        <h2 style="color:#1e1b4b; margin-bottom:4px;">Vortex ERP</h2>
         <h3 style="color:#374151; font-weight:500; margin-bottom:16px;">Redefinição de senha</h3>
         <p style="color:#555; margin-bottom:8px;">
           Use o código abaixo para redefinir sua senha. Ele expira em <strong>15 minutos</strong>.
@@ -77,7 +77,7 @@ export async function sendPasswordChangedEmail(to: string, name: string): Promis
     subject: 'Sua senha foi alterada — Vortex ERP',
     html: `
       <div style="${baseStyle}">
-        <h2 style="color:#1e1b4b; margin-bottom:4px;">⚡ Vortex ERP</h2>
+        <h2 style="color:#1e1b4b; margin-bottom:4px;">Vortex ERP</h2>
         <h3 style="color:#374151; font-weight:500; margin-bottom:16px;">Senha alterada com sucesso</h3>
         <p style="color:#555;">Olá, <strong>${name}</strong>!</p>
         <p style="color:#555; margin-bottom:8px;">

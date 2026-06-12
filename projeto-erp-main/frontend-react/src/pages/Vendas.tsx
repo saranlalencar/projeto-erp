@@ -3,6 +3,9 @@ import { api } from '../api/client';
 import { Badge, Button, Icon, Modal, IconButton } from '../design-system/components';
 import { useBeforeUnload } from '../hooks/useBeforeUnload';
 import { useFormDraft, loadFormDraft, clearFormDraft } from '../hooks/useFormDraft';
+import { useConfirm } from '../hooks/useConfirm';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { useHighlight } from '../hooks/useHighlight';
 
 interface ItemVenda { quantidade: number; produto: { nome: string; preco: number }; }
 interface Venda {
@@ -39,6 +42,8 @@ const selectStyle: React.CSSProperties = {
 };
 
 export function Vendas() {
+  const { confirm, dialogProps } = useConfirm();
+  const hl = useHighlight();
   const [vendas, setVendas] = useState<Venda[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [clientes, setClientes] = useState<ClienteOpt[]>([]);
@@ -68,7 +73,12 @@ export function Vendas() {
     setShowModal(true);
   }
 
-  function fecharModal() {
+  async function fecharModal() {
+    const temDados = !!clienteId || linhas.some((l) => !!l.produtoId);
+    if (temDados) {
+      const ok = await confirm('Deseja cancelar? Os dados da venda serão descartados.');
+      if (!ok) return;
+    }
     clearFormDraft('venda-draft');
     setShowModal(false);
   }
@@ -120,6 +130,12 @@ export function Vendas() {
     await api.patch(`/api/vendas/${id}/status`, { status: novo });
   }
 
+  async function cancelarVenda(id: number) {
+    const ok = await confirm('Deseja cancelar esta venda? O status será alterado para "Cancelado".', { confirmLabel: 'Cancelar venda' });
+    if (!ok) return;
+    await mover(id, 'cancelado');
+  }
+
   const porStatus = (s: string) => vendas.filter((v) => v.status === s);
 
   const miniBtn = (color: string, ghost?: boolean) => ({
@@ -152,8 +168,11 @@ export function Vendas() {
               <div style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 10, minHeight: 90 }}>
                 {lista.length === 0 ? (
                   <div style={{ color: 'var(--slate-400)', textAlign: 'center', padding: '20px 0', fontSize: 'var(--text-sm)' }}>Vazio</div>
-                ) : lista.map((v) => (
-                  <div key={v.id} style={{ background: 'var(--surface-sunken)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: 12 }}>
+                ) : lista.map((v) => {
+                  const isHl = (hl === 'vendas-abertas' && v.status === 'aberto')
+                    || (hl === 'vendas-andamento' && v.status === 'em_andamento');
+                  return (
+                  <div key={v.id} className={isHl ? 'vtx-card-highlight' : undefined} style={{ background: 'var(--surface-sunken)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: 12 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-strong)' }}>#{v.id}</span>
                       <span style={{ fontWeight: 800, fontSize: 'var(--text-base)', color: 'var(--color-primary)', fontVariantNumeric: 'tabular-nums' }}>{fmt(v.total)}</span>
@@ -169,11 +188,12 @@ export function Vendas() {
                         </button>
                       )}
                       {col.key !== 'cancelado' && col.key !== 'concluido' && (
-                        <button onClick={() => mover(v.id, 'cancelado')} style={miniBtn('var(--text-muted)', true)}>Cancelar</button>
+                        <button onClick={() => cancelarVenda(v.id)} style={miniBtn('var(--text-muted)', true)}>Cancelar</button>
                       )}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           );
@@ -259,6 +279,8 @@ export function Vendas() {
           </div>
         </Modal>
       )}
+
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }

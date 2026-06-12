@@ -2,95 +2,101 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Input, Button, Icon } from '../design-system/components';
+import { AuthShell, Alert, Spinner } from '../components/auth/AuthKit';
 
-const Logo = () => (
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 26 }}>
-    <span style={{ width: 44, height: 44, borderRadius: 'var(--radius-lg)', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <svg width="28" height="28" viewBox="0 0 200 200" fill="none">
-        <g transform="translate(100,100)" strokeLinecap="round">
-          <path d="M -60,0 A 60,60 0 1,1 0,60" stroke="#fff" strokeWidth="16" />
-          <path d="M -38,0 A 38,38 0 1,1 0,38" stroke="#fff" strokeWidth="12" opacity="0.7" />
-          <path d="M -19,0 A 19,19 0 1,1 0,19" stroke="#fff" strokeWidth="8" />
-          <circle cx="0" cy="0" r="5" fill="#fff" />
-        </g>
-      </svg>
-    </span>
-    <span style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 800, color: 'var(--text-strong)', letterSpacing: '-0.02em' }}>VORTEX</span>
-  </div>
-);
+const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
 export function Cadastro() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
-  const [erro, setErro] = useState('');
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [conf, setConf] = useState('');
+  const [erros, setErros] = useState<Record<string, string>>({});
+  const [erroGlobal, setErroGlobal] = useState('');
   const [loading, setLoading] = useState(false);
+
+  function clearErro(campo: string) {
+    setErros((p) => p[campo] ? { ...p, [campo]: '' } : p);
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setErro('');
-    if (form.password.length < 6) { setErro('A senha deve ter no mínimo 6 caracteres.'); return; }
-    if (form.password !== form.confirm) { setErro('As senhas não conferem.'); return; }
+    setErroGlobal('');
+    const ne: Record<string, string> = {};
+    if (!nome.trim()) ne.nome = 'Informe seu nome completo.';
+    if (!email.trim()) ne.email = 'Informe seu e-mail.';
+    else if (!isEmail(email)) ne.email = 'E-mail inválido.';
+    if (!senha) ne.senha = 'Crie uma senha.';
+    else if (senha.length < 8) ne.senha = 'A senha deve ter no mínimo 8 caracteres.';
+    if (!conf) ne.conf = 'Confirme a senha.';
+    else if (senha && conf !== senha) ne.conf = 'As senhas não coincidem.';
+    setErros(ne);
+    if (Object.keys(ne).length) return;
 
     setLoading(true);
     const { error } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-      options: { data: { name: form.name } },
+      email,
+      password: senha,
+      options: { data: { name: nome } },
     });
 
     if (error) {
-      if (error.message.includes('already registered')) setErro('Este e-mail já está cadastrado.');
-      else setErro('Erro ao criar conta. Tente novamente.');
+      if (error.message.includes('already registered')) setErroGlobal('Este e-mail já está cadastrado.');
+      else setErroGlobal('Erro ao criar conta. Tente novamente.');
       setLoading(false);
       return;
     }
 
-    // O perfil Prisma é criado automaticamente no primeiro login (middleware lazy)
-    navigate('/verificar-email', { state: { email: form.email } });
+    navigate('/verificar-email', { state: { email } });
     setLoading(false);
   }
 
-  const set = (f: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm((p) => ({ ...p, [f]: e.target.value }));
+  const temCampoVazio = Object.values(erros).some(Boolean);
+  const temSenhasDif = erros.conf === 'As senhas não coincidem.';
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-page)', padding: 24 }}>
-      <div style={{ width: 400 }}>
-        <Logo />
-        <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-md)', padding: '32px 30px' }}>
-          <h1 style={{ fontSize: 'var(--text-xl)', textAlign: 'center', marginBottom: 4 }}>Criar conta</h1>
-          <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 'var(--text-sm)', marginBottom: 24 }}>Preencha os dados para se cadastrar</p>
+    <AuthShell
+      title="Criar conta"
+      subtitle="Comece a usar o VORTEX ERP"
+      footer={<>Já tem conta? <Link to="/login" style={{ fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none' }}>Entrar</Link></>}
+    >
+      <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {erroGlobal && <Alert tone="danger">{erroGlobal}</Alert>}
+        {!erroGlobal && temSenhasDif && <Alert tone="danger">As senhas não coincidem. Verifique e tente novamente.</Alert>}
+        {!erroGlobal && !temSenhasDif && temCampoVazio && <Alert tone="warning">Preencha os campos destacados para continuar.</Alert>}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <Input label="Nome completo" leadingIcon={<Icon name="users" size={16} />}
-              value={form.name} onChange={set('name')} placeholder="Seu nome" required />
-            <Input label="E-mail" type="email" leadingIcon={<Icon name="mail" size={16} />}
-              value={form.email} onChange={set('email')} placeholder="voce@empresa.com" required />
-            <Input label="Senha" type="password"
-              value={form.password} onChange={set('password')} placeholder="Mínimo 6 caracteres" required />
-            <Input label="Confirmar senha" type="password"
-              value={form.confirm} onChange={set('confirm')} placeholder="Repita a senha" required />
-
-            {erro && (
-              <div style={{ padding: '10px 14px', background: 'var(--danger-bg)', color: 'var(--danger-text)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-sm)', fontWeight: 500 }}>
-                {erro}
-              </div>
-            )}
-
-            <Button type="submit" fullWidth size="lg" disabled={loading} style={{ marginTop: 4 }}>
-              {loading ? 'Criando conta...' : 'Criar conta'}
-            </Button>
-          </form>
-        </div>
-
-        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 'var(--text-sm)', marginTop: 18 }}>
-          Já tem conta?{' '}
-          <Link to="/login" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>Fazer login</Link>
-        </p>
-        <p style={{ textAlign: 'center', color: 'var(--slate-400)', fontSize: 'var(--text-xs)', marginTop: 12 }}>
-          © 2026 VORTEX ERP · Vendas · Financeiro · Estoque
-        </p>
-      </div>
-    </div>
+        <Input
+          label="Nome completo" value={nome}
+          onChange={(e) => { setNome(e.target.value); clearErro('nome'); }}
+          placeholder="Seu nome"
+          error={erros.nome}
+        />
+        <Input
+          label="E-mail" type="email" value={email}
+          onChange={(e) => { setEmail(e.target.value); clearErro('email'); }}
+          leadingIcon={<Icon name="mail" size={16} />}
+          placeholder="voce@empresa.com"
+          error={erros.email}
+        />
+        <Input
+          label="Senha" type="password" value={senha}
+          onChange={(e) => { setSenha(e.target.value); clearErro('senha'); }}
+          placeholder="Mínimo 8 caracteres"
+          hint={erros.senha ? undefined : 'Use letras, números e um símbolo.'}
+          error={erros.senha}
+        />
+        <Input
+          label="Confirmar senha" type="password" value={conf}
+          onChange={(e) => { setConf(e.target.value); clearErro('conf'); }}
+          placeholder="Repita a senha"
+          error={erros.conf}
+        />
+        <Button type="submit" fullWidth size="lg" disabled={loading}
+          leadingIcon={loading ? <Spinner size={17} color="#fff" /> : undefined}>
+          {loading ? 'Criando conta...' : 'Criar conta'}
+        </Button>
+      </form>
+    </AuthShell>
   );
 }

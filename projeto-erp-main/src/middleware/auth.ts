@@ -23,6 +23,9 @@ export async function requireAuth(req: AuthRequest, res: Response, next: NextFun
 
   // Busca ou cria o perfil no Prisma (criação lazy no primeiro login)
   let perfil = await prisma.user.findUnique({ where: { id: supaUser.id } });
+  const VALID_ROLES = ['admin', 'vendedor'];
+  const rawRole = supaUser.user_metadata?.role as string | undefined;
+  const metaRole = rawRole && VALID_ROLES.includes(rawRole) ? rawRole : 'vendedor';
 
   if (!perfil) {
     const name = (supaUser.user_metadata?.name as string | undefined)
@@ -35,10 +38,16 @@ export async function requireAuth(req: AuthRequest, res: Response, next: NextFun
         name,
         email: supaUser.email!,
         password: 'supabase_managed',
-        role: 'user',
+        role: metaRole,
         status: 'ativo',
         emailVerified: true,
       },
+    });
+  } else if (metaRole !== 'vendedor' && perfil.role !== metaRole) {
+    // Sincroniza role do Supabase metadata caso o registro Prisma esteja desatualizado
+    perfil = await prisma.user.update({
+      where: { id: perfil.id },
+      data: { role: metaRole },
     });
   }
 

@@ -46,8 +46,8 @@ router.put('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
   res.json({ success: true, produto });
 });
 
-// DELETE /api/estoque/:id — apenas admin/manager
-router.delete('/:id', requireRole('admin', 'manager'), async (req: AuthRequest, res: Response): Promise<void> => {
+// DELETE /api/estoque/:id — apenas admin
+router.delete('/:id', requireRole('admin'), async (req: AuthRequest, res: Response): Promise<void> => {
   const id = Number(req.params.id);
   const exists = await prisma.produto.findUnique({ where: { id } });
   if (!exists) { res.status(404).json({ error: 'produto_nao_encontrado' }); return; }

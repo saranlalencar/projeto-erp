@@ -1,6 +1,8 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Sidebar, SidebarItem, Topbar, IconButton, Avatar, Button, Icon } from '../design-system/components';
+import { Sidebar, SidebarItem, Topbar, Avatar, Button, Icon } from '../design-system/components';
+import { ProfileDropdown } from './ProfileDropdown';
+import { NotificationDropdown } from './NotificationDropdown';
 
 const NAV = [
   { to: '/dashboard',  icon: 'dashboard', label: 'Dashboard',  crumb: 'Visão Geral' },
@@ -11,12 +13,19 @@ const NAV = [
   { to: '/usuarios',   icon: 'shield',    label: 'Usuários',   crumb: 'Administração' },
 ] as const;
 
+const PAGE_OVERRIDES: Record<string, { label: string; crumb: string }> = {
+  '/meu-perfil':    { label: 'Meu Perfil',    crumb: 'Conta' },
+  '/sem-permissao': { label: 'Sem Permissão', crumb: 'Sistema' },
+};
+
 export function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
-  const path = window.location.pathname;
-  const current = NAV.find((n) => path.startsWith(n.to)) ?? NAV[0];
+  const current = PAGE_OVERRIDES[pathname]
+    ?? NAV.find((n) => pathname.startsWith(n.to))
+    ?? NAV[0];
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-page)' }}>
@@ -67,9 +76,9 @@ export function Layout() {
             title={current.label}
             actions={
               <>
-                <IconButton icon={<Icon name="bell" size={18} />} label="Notificações" />
+                <NotificationDropdown />
                 <div style={{ width: 1, height: 24, background: 'var(--border-default)', margin: '0 4px' }} />
-                <Avatar name={user?.name ?? 'Usuário'} size="sm" />
+                <ProfileDropdown />
               </>
             }
           />

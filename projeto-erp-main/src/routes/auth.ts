@@ -9,7 +9,56 @@ const router = Router();
 router.get('/me', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
   if (!user) { res.status(404).json({ error: 'perfil_nao_encontrado' }); return; }
-  res.json({ id: user.id, name: user.name, email: user.email, role: user.role, status: user.status, avatar: user.avatar });
+  res.json({ id: user.id, name: user.name, email: user.email, role: user.role, status: user.status, avatar: user.avatar, telefone: user.telefone, createdAt: user.createdAt });
+});
+
+// PATCH /auth/me — atualiza perfil do usuário autenticado
+router.patch('/me', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { name, telefone, role } = req.body as { name?: string; telefone?: string; role?: string };
+    const userId = req.user!.id;
+    const isAdmin = req.user!.role === 'admin';
+
+    if (name !== undefined && name.trim() === '') {
+      res.status(400).json({ error: 'nome_obrigatorio' });
+      return;
+    }
+
+    const VALID_ROLES = ['admin', 'vendedor'] as const;
+    type ValidRole = typeof VALID_ROLES[number];
+
+    const updateData: { name?: string; telefone?: string; role?: string } = {};
+    if (name !== undefined) updateData.name = name.trim();
+    if (telefone !== undefined) updateData.telefone = telefone;
+    if (role !== undefined && isAdmin && (VALID_ROLES as readonly string[]).includes(role)) {
+      updateData.role = role;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      const current = await prisma.user.findUnique({ where: { id: userId } });
+      if (!current) { res.status(404).json({ error: 'perfil_nao_encontrado' }); return; }
+      res.json({ id: current.id, name: current.name, email: current.email, role: current.role, status: current.status, telefone: current.telefone });
+      return;
+    }
+
+    const user = await prisma.user.update({ where: { id: userId }, data: updateData });
+
+    // Sincroniza metadados Supabase (não-fatal: dados já foram salvos no banco)
+    if (updateData.name !== undefined || updateData.role !== undefined) {
+      try {
+        await supabaseAdmin.auth.admin.updateUserById(userId, {
+          user_metadata: { name: user.name, role: user.role as ValidRole },
+        });
+      } catch (supaErr) {
+        console.error('[auth/me PATCH] Aviso: falha ao sincronizar Supabase metadata:', supaErr);
+      }
+    }
+
+    res.json({ id: user.id, name: user.name, email: user.email, role: user.role, status: user.status, telefone: user.telefone });
+  } catch (err) {
+    console.error('[auth/me PATCH] Erro interno:', err);
+    res.status(500).json({ error: 'erro_interno' });
+  }
 });
 
 // POST /auth/logout — revoga a sessão Supabase (opcional, o cliente já faz isso)
@@ -34,7 +83,7 @@ router.post('/admin-create-user', requireAuth, async (req: Request, res: Respons
     email,
     password,
     email_confirm: true,
-    user_metadata: { name },
+    user_metadata: { name, role },
   });
 
   if (error) {

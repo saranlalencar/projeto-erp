@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { Card, Table, Button, Badge, StatCard, IconButton, Modal, Icon, Input } from '../design-system/components';
+import { Alert } from '../components/auth/AuthKit';
 import { useBeforeUnload } from '../hooks/useBeforeUnload';
+import { useAuth } from '../contexts/AuthContext';
+import { useConfirm } from '../hooks/useConfirm';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { useHighlight } from '../hooks/useHighlight';
 
 type TipoConta = 'receita' | 'despesa';
 interface Conta { id: number; descricao: string; valor: number; tipo: TipoConta; pago: boolean; vencimento: string | null; }
@@ -14,11 +19,16 @@ const fmtDate = (s: string | null) => {
 };
 
 export function Financeiro() {
+  const { can } = useAuth();
+  const { confirm, dialogProps } = useConfirm();
+  const hl = useHighlight();
+  const canDelete = can('financeiro', 'delete');
   const [contas, setContas] = useState<Conta[]>([]);
   const [filtro, setFiltro] = useState<'' | TipoConta>('');
   const [showForm, setShowForm] = useState(false);
   const [editando, setEditando] = useState<Conta | null>(null);
   const [form, setForm] = useState({ descricao: '', valor: '', tipo: 'receita' as TipoConta, vencimento: '' });
+  const [errs, setErrs] = useState<Record<string, string>>({});
   const [salvando, setSalvando] = useState(false);
 
   useBeforeUnload(showForm && (!!form.descricao || !!form.valor));
@@ -37,25 +47,56 @@ export function Financeiro() {
   function abrirNovo() {
     setEditando(null);
     setForm({ descricao: '', valor: '', tipo: 'receita', vencimento: '' });
+    setErrs({});
     setShowForm(true);
   }
 
   function abrirEdicao(c: Conta) {
     setEditando(c);
     setForm({ descricao: c.descricao, valor: String(c.valor), tipo: c.tipo, vencimento: c.vencimento ? c.vencimento.substring(0, 10) : '' });
+    setErrs({});
     setShowForm(true);
   }
 
+  function set(campo: keyof typeof form, val: string) {
+    setForm((p) => ({ ...p, [campo]: val }));
+    setErrs((p) => ({ ...p, [campo]: '' }));
+  }
+
+  async function fecharForm() {
+    const temDados = editando ? true : (!!form.descricao || !!form.valor);
+    if (temDados) {
+      const ok = await confirm('Deseja cancelar? Os dados preenchidos serão descartados.');
+      if (!ok) return;
+    }
+    setShowForm(false);
+    setErrs({});
+    setEditando(null);
+  }
+
   async function salvar() {
-    if (!form.descricao || !form.valor) return;
+    const ne: Record<string, string> = {};
+    if (!form.descricao.trim()) ne.descricao = 'Informe a descrição.';
+    if (!form.valor) ne.valor = 'Informe o valor.';
+    else if (isNaN(Number(form.valor)) || Number(form.valor) <= 0) ne.valor = 'Valor inválido.';
+    if (Object.keys(ne).length) { setErrs(ne); return; }
+
+    const ok = await confirm(
+      editando ? 'Deseja salvar as alterações desta conta?' : 'Deseja cadastrar esta conta?'
+    );
+    if (!ok) return;
+
     setSalvando(true);
     const body = { descricao: form.descricao, valor: Number(form.valor), tipo: form.tipo, vencimento: form.vencimento || undefined };
     try {
       if (editando) await api.put(`/api/financeiro/${editando.id}`, body);
       else          await api.post('/api/financeiro', body);
       setShowForm(false);
+      setEditando(null);
       await carregar();
-    } catch { /* silent */ }
+    } catch {
+      setErrs({ _global: 'Erro ao salvar conta. Tente novamente.' });
+    }
     setSalvando(false);
   }
 
@@ -65,10 +106,13 @@ export function Financeiro() {
   }
 
   async function excluir(id: number) {
-    if (!confirm('Excluir esta conta?')) return;
+    const ok = await confirm('Deseja excluir esta conta? Esta ação não pode ser desfeita.', { confirmLabel: 'Excluir' });
+    if (!ok) return;
     await api.del(`/api/financeiro/${id}`);
     setContas((prev) => prev.filter((c) => c.id !== id));
   }
+
+  const temErro = Object.values(errs).some(Boolean);
 
   return (
     <div>
@@ -104,32 +148,48 @@ export function Financeiro() {
           rowKey="id"
           data={filtradas}
           empty="Nenhuma conta encontrada."
+          highlightedKeys={(() => {
+            if (!hl) return undefined;
+            const agora = new Date();
+            const em7Dias = new Date(agora.getTime() + 7 * 24 * 60 * 60 * 1000);
+            if (hl === 'contas-vencidas')
+              return new Set(contas.filter((c) => !c.pago && c.vencimento && new Date(c.vencimento) < agora).map((c) => c.id));
+            if (hl === 'contas-a-vencer')
+              return new Set(contas.filter((c) => !c.pago && c.vencimento && new Date(c.vencimento) >= agora && new Date(c.vencimento) <= em7Dias).map((c) => c.id));
+            return undefined;
+          })()}
           columns={[
-            { key: 'descricao', header: 'Descrição', render: (r: Conta) => <strong style={{ color: 'var(--text-strong)', fontWeight: 600 }}>{r.descricao}</strong> },
-            { key: 'tipo',      header: 'Tipo',       render: (r: Conta) => <Badge tone={r.tipo === 'receita' ? 'success' : 'danger'}>{r.tipo === 'receita' ? 'Receita' : 'Despesa'}</Badge> },
-            { key: 'valor',     header: 'Valor',      align: 'right', render: (r: Conta) => <span style={{ fontWeight: 700, color: r.tipo === 'receita' ? 'var(--success-text)' : 'var(--danger-text)', fontVariantNumeric: 'tabular-nums' }}>{fmt(r.valor)}</span> },
-            { key: 'vencimento',header: 'Vencimento', render: (r: Conta) => <span style={{ color: 'var(--text-muted)' }}>{fmtDate(r.vencimento)}</span> },
-            { key: 'status',    header: 'Status',     render: (r: Conta) => <Badge tone={r.pago ? 'success' : 'warning'} dot>{r.pago ? 'Pago' : 'Pendente'}</Badge> },
-            { key: 'acoes',     header: '',           align: 'right', width: '150px', render: (r: Conta) => (
+            { key: 'descricao', header: 'Descrição',  render: (r: Conta) => <strong style={{ color: 'var(--text-strong)', fontWeight: 600 }}>{r.descricao}</strong> },
+            { key: 'tipo',      header: 'Tipo',        render: (r: Conta) => <Badge tone={r.tipo === 'receita' ? 'success' : 'danger'}>{r.tipo === 'receita' ? 'Receita' : 'Despesa'}</Badge> },
+            { key: 'valor',     header: 'Valor',       align: 'right', render: (r: Conta) => <span style={{ fontWeight: 700, color: r.tipo === 'receita' ? 'var(--success-text)' : 'var(--danger-text)', fontVariantNumeric: 'tabular-nums' }}>{fmt(r.valor)}</span> },
+            { key: 'vencimento',header: 'Vencimento',  render: (r: Conta) => <span style={{ color: 'var(--text-muted)' }}>{fmtDate(r.vencimento)}</span> },
+            { key: 'status',    header: 'Status',      render: (r: Conta) => <Badge tone={r.pago ? 'success' : 'warning'} dot>{r.pago ? 'Pago' : 'Pendente'}</Badge> },
+            { key: 'acoes',     header: '',            align: 'right', width: '150px', render: (r: Conta) => (
               <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
                 <Button size="sm" variant={r.pago ? 'secondary' : 'primary'} onClick={() => togglePago(r)}>{r.pago ? 'Desfazer' : 'Pagar'}</Button>
                 <IconButton icon={<Icon name="edit" size={16} />} label="Editar" onClick={() => abrirEdicao(r)} />
-                <IconButton icon={<Icon name="trash" size={16} />} label="Excluir" style={{ color: 'var(--danger-text)' }} onClick={() => excluir(r.id)} />
+                <IconButton icon={<Icon name="trash" size={16} />} label="Excluir" disabled={!canDelete} style={canDelete ? { color: 'var(--danger-text)' } : undefined} onClick={() => excluir(r.id)} />
               </div>
-            ) },
+            )},
           ]}
         />
       </Card>
 
       {showForm && (
-        <Modal title={editando ? 'Editar Conta' : 'Nova Conta'} onClose={() => setShowForm(false)}
+        <Modal title={editando ? 'Editar Conta' : 'Nova Conta'} onClose={fecharForm}
           footer={<>
-            <Button variant="secondary" onClick={() => setShowForm(false)}>Cancelar</Button>
+            <Button variant="secondary" onClick={fecharForm}>Cancelar</Button>
             <Button onClick={salvar} disabled={salvando}>{salvando ? 'Salvando...' : 'Salvar'}</Button>
           </>}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <Input label="Descrição *" placeholder="Ex: Pagamento de fornecedor" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
-            <Input label="Valor (R$) *" type="number" placeholder="0.00" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} />
+            {errs._global
+              ? <Alert tone="danger">{errs._global}</Alert>
+              : temErro && <Alert tone="warning">Preencha os campos obrigatórios destacados para continuar.</Alert>
+            }
+            <Input label="Descrição *" placeholder="Ex: Pagamento de fornecedor"
+              value={form.descricao} onChange={(e) => set('descricao', e.target.value)} error={errs.descricao} />
+            <Input label="Valor (R$) *" type="number" placeholder="0.00"
+              value={form.valor} onChange={(e) => set('valor', e.target.value)} error={errs.valor} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               <div>
                 <label style={{ display: 'block', marginBottom: 5, fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--text-body)' }}>Tipo</label>
@@ -139,11 +199,14 @@ export function Financeiro() {
                   <option value="despesa">Despesa</option>
                 </select>
               </div>
-              <Input label="Vencimento" type="date" value={form.vencimento} onChange={(e) => setForm({ ...form, vencimento: e.target.value })} />
+              <Input label="Vencimento" type="date"
+                value={form.vencimento} onChange={(e) => set('vencimento', e.target.value)} />
             </div>
           </div>
         </Modal>
       )}
+
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }

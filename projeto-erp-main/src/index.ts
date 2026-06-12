@@ -8,6 +8,7 @@ import clientesRoutes from './routes/clientes';
 import estoqueRoutes from './routes/estoque';
 import financeiroRoutes from './routes/financeiro';
 import vendasRoutes from './routes/vendas';
+import notificacoesRoutes from './routes/notificacoes';
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use('/api/clientes', clientesRoutes);
 app.use('/api/estoque', estoqueRoutes);
 app.use('/api/financeiro', financeiroRoutes);
 app.use('/api/vendas', vendasRoutes);
+app.use('/api/notificacoes', notificacoesRoutes);
 
 app.listen(3000, () => {
   console.log('Servidor rodando na porta 3000');

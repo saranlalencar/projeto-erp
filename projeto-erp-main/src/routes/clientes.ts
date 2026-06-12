@@ -22,35 +22,40 @@ router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
 
 // POST /api/clientes
 router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
-  const { nome, email, telefone } = req.body;
+  const { nome, email, telefone, cpfCnpj } = req.body;
   if (!nome || !email) { res.status(400).json({ error: 'campos_obrigatorios' }); return; }
 
   const existing = await prisma.cliente.findUnique({ where: { email } });
   if (existing) { res.status(409).json({ error: 'email_em_uso' }); return; }
 
-  const cliente = await prisma.cliente.create({ data: { nome, email, telefone } });
-  res.status(201).json({ success: true, cliente });
+  const cliente = await prisma.cliente.create({ data: { nome, email, telefone, cpfCnpj } });
+  res.status(201).json(cliente);
 });
 
 // PUT /api/clientes/:id
 router.put('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
-  const id = Number(req.params.id);
-  const { nome, email, telefone } = req.body;
+  try {
+    const id = Number(req.params.id);
+    const { nome, email, telefone, cpfCnpj } = req.body;
 
-  const exists = await prisma.cliente.findUnique({ where: { id } });
-  if (!exists) { res.status(404).json({ error: 'cliente_nao_encontrado' }); return; }
+    const exists = await prisma.cliente.findUnique({ where: { id } });
+    if (!exists) { res.status(404).json({ error: 'cliente_nao_encontrado' }); return; }
 
-  const data: Record<string, unknown> = {};
-  if (nome !== undefined) data.nome = nome;
-  if (email !== undefined) data.email = email;
-  if (telefone !== undefined) data.telefone = telefone;
+    const data: Record<string, unknown> = {};
+    if (nome !== undefined) data.nome = nome;
+    if (email !== undefined) data.email = email;
+    if (telefone !== undefined) data.telefone = telefone;
+    if (cpfCnpj !== undefined) data.cpfCnpj = cpfCnpj;
 
-  const cliente = await prisma.cliente.update({ where: { id }, data });
-  res.json({ success: true, cliente });
+    const cliente = await prisma.cliente.update({ where: { id }, data });
+    res.json(cliente);
+  } catch {
+    res.status(500).json({ error: 'erro_interno' });
+  }
 });
 
-// DELETE /api/clientes/:id — apenas admin/manager
-router.delete('/:id', requireRole('admin', 'manager'), async (req: AuthRequest, res: Response): Promise<void> => {
+// DELETE /api/clientes/:id — apenas admin
+router.delete('/:id', requireRole('admin'), async (req: AuthRequest, res: Response): Promise<void> => {
   const id = Number(req.params.id);
   const exists = await prisma.cliente.findUnique({ where: { id } });
   if (!exists) { res.status(404).json({ error: 'cliente_nao_encontrado' }); return; }

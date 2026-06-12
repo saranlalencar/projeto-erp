@@ -55,6 +55,7 @@ export function Button({
 
   return (
     <button
+      type="button"
       disabled={disabled}
       style={{
         display: 'inline-flex',
